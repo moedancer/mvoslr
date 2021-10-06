@@ -1,15 +1,23 @@
 Package: mvoslr
-Title: What the Package Does (One Line, Title Case)
+Title: Planning and analysis of group sequential adaptive multivariate one-sample log-rank tests
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Moritz Fabian",
+           family = "Danzer",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+           email = "moritz.danzer@gmail.com",
+           comment = c(ORCID = "0000-0002-0512-4227"))
+Description: Group sequential multivariate one-sample log-rank tests can be applied when several time-to-event endpoints
+  in an experimental group shall be compared with a reference distribution. In this case, we assume that this reference 
+  distribution is specified by a multi-state (Semi-)Markov model. This package provides functions to execute interim and
+  final analyses, compute the power of such trials (via simulation) and compute conditional power to enable sample size
+  recalculations.
+Depends: 
+  R (>= 4.1.1)
+Imports:
+    rpact,
+    mstate
+License: AGPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
