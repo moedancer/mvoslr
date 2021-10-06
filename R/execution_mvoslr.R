@@ -1,6 +1,6 @@
 #' Execution of interim and final analyses of multivariate group-sequential one-sample log-rank test
 #'
-#' @param msm_data data frame containing information about any (possible) transition of patients in the study with the following columns:
+#' @param msm_data Data frame containing information about any (possible) transition of patients in the study with the following columns:
 #' \itemize{
 #'   \item id - ID of the patient to whom this entry belongs
 #'   \item Tstart - Start of the observation period for this transition
@@ -23,7 +23,7 @@
 #' @param alpha Choose type I error rate (default value = 0.05)
 #' @param weights Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.
 #'
-#' @return List of 5:
+#' @return List of 6:
 #' \itemize{
 #'   \item raw_martingale - Values of the multivariate process at all stages
 #'   \item covariation_martrices - Estimated covariation matrices of the multivariate process at all stages
