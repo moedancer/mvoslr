@@ -39,6 +39,8 @@
 #'                          for each sample size
 #' }
 #'
+#' @import stats
+#'
 execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = NULL, transition_matrix, cum_hazard_functions, model_type,
                                   events, accrual_durations, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
 
@@ -58,6 +60,9 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
     number_accrual_durations <- length(accrual_durations)
     number_event_types       <- length(events)
     number_of_analyses       <- length(analysis_dates)
+
+    transitions <- mstate::to.trans2(transition_matrix)
+    number_of_trans <- dim(transitions)[1]
 
     # Use equal weights if not specified otherwise
     if(is.null(weights)) weights <- rep(1/sqrt(number_of_analyses), number_of_analyses)
@@ -79,7 +84,7 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
     uv_test_statistic <- matrix(0, nrow = current_analysis, ncol = number_accrual_durations)
 
     # Assign names to arrays for better readability of outputs
-    if(is.null(names(events))) names(events) <- paste("Event", 1:num_events, sep = " ")
+    if(is.null(names(events))) names(events) <- paste("Event", 1:number_event_types, sep = " ")
 
     dimnames(mv_martingale)[[1]] <- names(events)
     dimnames(mv_test_statistic)[[1]] <- names(events)
@@ -114,9 +119,6 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
       # Calculate accumulated hazards for each transition
       # Create column to enter accumulated hazards
       msm_data_temp$acc_haz <- rep(0, dim(msm_data_temp)[1])
-
-      transitions <- to.trans2(transition_matrix)
-      number_of_trans <- dim(transitions)[1]
 
       for(i in 1:number_of_trans){
 
@@ -256,9 +258,11 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
 
     # Set group sequential boundaries according to chosen method and number of analyses
     if(boundaries == "obf"){
-      levels <- getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2, typeOfDesign = "OF")$stageLevels * 2
+      levels <- rpact::getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2,
+                                                typeOfDesign = "OF")$stageLevels * 2
     } else if(boundaries == "pocock"){
-      levels <- getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2, typeOfDesign = "P")$stageLevels * 2
+      levels <- rpact::getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2,
+                                                typeOfDesign = "P")$stageLevels * 2
     } else {
       cat("Chosen sequential boundary not available. Choose either \"obf\" or \"pocock\"!")
     }

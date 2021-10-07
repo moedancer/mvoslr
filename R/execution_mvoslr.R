@@ -32,9 +32,14 @@
 #'   \item decision - Decision to be made at the current analysis
 #'   \item decision_stage - Number of analysis at which the null hypothesis is rejected (\code{NA} if not applicable)
 #' }
+#'
+#' @import stats
+#'
 #' @export
+#'
 #' @examples
 #' #Setup of reference multi-state model (here: simple illness-death model)
+#' library(mstate)
 #' tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
 #' number_of_trans_example <- dim(to.trans2(tmat_example))[1]
 #' model_type_example <- "SM"
@@ -44,18 +49,19 @@
 #' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
 #' analysis_dates_example <- c(1, 2)
 #' events_example <- list(c(2,3), c(3))
-#' #Fictional data from observations in multi-state model with one dead patient without illness (\code{id =1}),
-#' # one dead patient with illness (\code{id =2}), one healthy, censored patient (\code{id =3}) and
-#' # one ill, censored patient (\code{id =4})
-#' msm_data_example <- data.frame(id = c(1,1,2,2,2,3,3), Tstart = c(0,0,0,0,0.5,0,0,0,0,1),
+#' names(events_example) <- c("PFS", "OS")
+#' #Fictional data from observations in multi-state model with one dead patient without illness
+#' #  (\code{id =1}), one dead patient with illness (\code{id =2}), one healthy, censored patient
+#' #  (\code{id =3}) and one ill, censored patient (\code{id =4})
+#' msm_data_example <- data.frame(id = c(1,1,2,2,2,3,3,4,4,4), Tstart = c(0,0,0,0,0.5,0,0,0,0,1),
 #'                                Tstop = c(0.8,0.8,0.5,0.5,1.2,1.3,1.3,1,1,1.1),
 #'                                duration = c(0.8,0.8,0.5,0.5,0.7,1.3,1.3,1,1,0.1),
 #'                                from = c(1,1,1,1,2,1,1,1,1,2), to = c(2,3,2,3,3,2,3,2,3,3),
 #'                                status = c(0,1,1,0,1,0,0,1,0,0), trans = c(1,2,1,2,3,1,2,1,2,3),
 #'                                recruitment_date = c(0,0,0.3,0.3,0.3,0.7,0.7,0.9,0.9,0.9))
-#' execution_mvoslr(msm_data_example, analysis_dates = analysis_dates_example, current_analysis = 2, transition_matrix = tmat_example,
-#'                  cum_hazard_functions = cum_hazards_example, model_type = model_type_example, events = events_example)
-names(events_example) <- c("PFS", "OS")
+#' execution_mvoslr(msm_data_example, analysis_dates = analysis_dates_example, current_analysis = 2,
+#'                  transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
+#'                  model_type = model_type_example, events = events_example)
 execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, transition_matrix, cum_hazard_functions,
                              model_type, events, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
 
@@ -73,6 +79,9 @@ execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, 
 
     number_event_types <- length(events)
     number_of_analyses <- length(analysis_dates)
+
+    transitions <- mstate::to.trans2(transition_matrix)
+    number_of_trans <- dim(transitions)[1]
 
     if(is.null(weights)) weights <- rep(1/sqrt(number_of_analyses), number_of_analyses)
 
@@ -126,9 +135,6 @@ execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, 
 
       #create column to enter accumulated hazards
       msm_data_temp$acc_haz <- rep(0, dim(msm_data_temp)[1])
-
-      transitions <- to.trans2(transition_matrix)
-      number_of_trans <- dim(transitions)[1]
 
       for(i in 1:number_of_trans){
 
@@ -240,9 +246,11 @@ execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, 
     }
 
     if(boundaries == "obf"){
-      levels <- getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2, typeOfDesign = "OF")$stageLevels * 2
+      levels <- rpact::getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2,
+                                                typeOfDesign = "OF")$stageLevels * 2
     } else if(boundaries == "pocock"){
-      levels <- getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2, typeOfDesign = "P")$stageLevels * 2
+      levels <- rpact::getDesignGroupSequential(kMax = number_of_analyses, alpha = alpha, sided = 2,
+                                                typeOfDesign = "P")$stageLevels * 2
     } else {
       cat("Chosen sequential boundary not available. Choose either \"obf\" or \"pocock\"!")
     }

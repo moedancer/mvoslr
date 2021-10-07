@@ -37,9 +37,12 @@
 #'
 #' @examples
 #' #Setup of reference multi-state model (here: simple illness-death model)
+#' library(mstate)
 #' tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
 #' number_of_trans_example <- dim(to.trans2(tmat_example))[1]
 #' model_type_example <- "SM"
+#' events_example <- list(c(2,3), c(3))
+#' names(events_example) <- c("PFS", "OS")
 #' cumhaz_12_example <- function(t) t^1.1
 #' cumhaz_13_example <- function(t) t^1.2
 #' cumhaz_23_example <- function(t) t^0.9
@@ -50,16 +53,19 @@
 #' recruitment_speed_example <- 100
 #' #In this example, the alternative is specified via separate hazard ratios for each transition
 #' hazard_ratios_example <- c(1.4, 1.2, 1.35)
-#' power_mvoslr(transition_matrix = tmat_example, model_type = model_type_example,
-#'              cum_hazard_functions_h0 = cum_hazards_example, interim_analysis_dates = interim_analysis_dates_example,
-#'              accrual_durations = accrual_durations_example, follow_up = follow_up_example,
-#'              recruitment_speed = recruitment_speed_example, hazard_ratios = hazard_ratios_example)
+#' power_mvoslr_fixed_fu(transition_matrix = tmat_example, model_type = model_type_example,
+#'                       events = events_example, cum_hazard_functions_h0 = cum_hazards_example,
+#'                       interim_analysis_dates = interim_analysis_dates_example,
+#'                       accrual_durations = accrual_durations_example,
+#'                       follow_up = follow_up_example,
+#'                       recruitment_speed = recruitment_speed_example,
+#'                       hazard_ratios = hazard_ratios_example, simulation_runs = 10)
 power_mvoslr_fixed_fu <- function(transition_matrix, model_type, events, cum_hazard_functions_h0, interim_analysis_dates,
                                   accrual_durations, follow_up, recruitment_speed, hazard_ratios = NULL, cum_hazard_functions_alternative = NULL,
                                   norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL, time_steps = 100,
                                   simulation_runs = 1000){
 
-  transitions <- to.trans2(transition_matrix)
+  transitions <- mstate::to.trans2(transition_matrix)
 
   num_events <- length(events)
   num_transitions <- dim(transitions)[1]
@@ -112,16 +118,16 @@ power_mvoslr_fixed_fu <- function(transition_matrix, model_type, events, cum_haz
     successful_simulation <- FALSE
     while(!successful_simulation){
       if(model_type == "M"){
-        sim_data <- try(mssample(Haz = cumhaz_alternative,
-                                 trans = transition_matrix,
-                                 M = sample_size,
-                                 output = "data"), silent = TRUE)
+        sim_data <- try(mstate::mssample(Haz = cumhaz_alternative,
+                                         trans = transition_matrix,
+                                         M = sample_size,
+                                         output = "data"), silent = TRUE)
       } else if(model_type == "SM"){
-        sim_data <- try(mssample(Haz = cumhaz_alternative,
-                                 trans = transition_matrix,
-                                 M = sample_size,
-                                 clock = "reset",
-                                 output = "data"), silent = TRUE)
+        sim_data <- try(mstate::mssample(Haz = cumhaz_alternative,
+                                         trans = transition_matrix,
+                                         M = sample_size,
+                                         clock = "reset",
+                                         output = "data"), silent = TRUE)
       }
       if (class(sim_data) != "try-error") successful_simulation <- TRUE
     }

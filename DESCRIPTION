@@ -13,10 +13,10 @@ Description: Group sequential multivariate one-sample log-rank tests can be appl
   final analyses, compute the power of such trials (via simulation) and compute conditional power to enable sample size
   recalculations.
 Depends: 
-  R (>= 4.1.1)
+  R (>= 4.1.0)
 Imports:
-    rpact,
-    mstate
+    mstate,
+    rpact
 License: AGPL (>= 3)
 Encoding: UTF-8
 LazyData: true
