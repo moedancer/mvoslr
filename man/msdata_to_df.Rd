@@ -7,7 +7,7 @@
 msdata_to_df(msdata)
 }
 \arguments{
-\item{msdata}{}
+\item{msdata}{Data set of type msdata from \code{mstate} package}
 }
 \value{
 data frame with column names corresponding to the columns names of msdata objects
