@@ -2,7 +2,7 @@
 % Please edit documentation in R/execution_mvoslr.R
 \name{execution_mvoslr}
 \alias{execution_mvoslr}
-\title{Title}
+\title{Execution of interim and final analyses of multivariate group-sequential one-sample log-rank test}
 \usage{
 execution_mvoslr(
   msm_data,
@@ -19,27 +19,76 @@ execution_mvoslr(
 )
 }
 \arguments{
-\item{msm_data}{data frame containing}
+\item{msm_data}{Data frame containing information about any (possible) transition of patients in the study with the following columns:
+\itemize{
+\item id - ID of the patient to whom this entry belongs
+\item Tstart - Start of the observation period for this transition
+\item Tstop - Stop of the observation period for this transition
+\item duration - Duration of the observation period for this transition
+\item from - Current state of the patient
+\item to - State to which a transition is possible
+\item status - Transition could (1) or could not be (0) observed
+\item trans - Number of this transition (according to \code{to.trans2(transition_matrix)})
+\item recruitment_date - Calendar date of recruitment of this patient
+}}
 
-\item{analysis_dates}{vector of calendar dates of analyses}
+\item{analysis_dates}{Vector of calendar dates of analyses}
 
-\item{current_analysis}{number of the current analysis}
+\item{current_analysis}{Number of the current analysis}
 
-\item{transition_matrix}{matrix of transitions between states as in mstate package}
+\item{transition_matrix}{Matrix of transitions between states as in mstate package}
 
-\item{cum_hazard_functions}{cumulative hazard functions for transitions in this model}
+\item{cum_hazard_functions}{Cumulative hazard functions for transitions in this model}
 
-\item{events}{list of}
+\item{model_type}{Reference multi-state model is either Markov (\code{model_type = "M"}) or Semi-Markov (\code{model_type = "SM"})}
 
-\item{norm}{use either \eqn{L^2}-norm (\code{norm = "l2"}) or \eqn{L^\infty}-norm (\code{norm = "linf"}) of vector of test statistics to compute stagewise p-values}
+\item{events}{List of (composite) events that shall be investigated}
 
-\item{boundaries}{use either}
+\item{norm}{Use either \eqn{L^2}-norm (\code{norm = "l2"}, default value) or \eqn{L^\infty}-norm (\code{norm = "linf"}) of vector of test statistics to compute stagewise p-values}
 
-\item{weights}{}
+\item{boundaries}{Use either O'Brien-Fleming'S (\code{boundaries = "obf"}, default value) or Pocock's (\code{boundaries = "pocock"}) sequential decision boundaries}
+
+\item{alpha}{Choose type I error rate (default value = 0.05)}
+
+\item{weights}{Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.}
 }
 \value{
-
+List of 6:
+\itemize{
+\item raw_martingale - Values of the multivariate process at all stages
+\item covariation_martrices - Estimated covariation matrices of the multivariate process at all stages
+\item stagewise_test_statistics - Stagewise univariate test statistics
+\item stagewise_p_values - Stagewise p-values
+\item decision - Decision to be made at the current analysis
+\item decision_stage - Number of analysis at which the null hypothesis is rejected (\code{NA} if not applicable)
+}
 }
 \description{
-Title
+Execution of interim and final analyses of multivariate group-sequential one-sample log-rank test
+}
+\examples{
+#Setup of reference multi-state model (here: simple illness-death model)
+library(mstate)
+tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
+number_of_trans_example <- dim(to.trans2(tmat_example))[1]
+model_type_example <- "SM"
+cumhaz_12_example <- function(t) t^1.1
+cumhaz_13_example <- function(t) t^1.2
+cumhaz_23_example <- function(t) t^0.9
+cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+analysis_dates_example <- c(1, 2)
+events_example <- list(c(2,3), c(3))
+names(events_example) <- c("PFS", "OS")
+#Fictional data from observations in multi-state model with one dead patient without illness
+#  (\code{id =1}), one dead patient with illness (\code{id =2}), one healthy, censored patient
+#  (\code{id =3}) and one ill, censored patient (\code{id =4})
+msm_data_example <- data.frame(id = c(1,1,2,2,2,3,3,4,4,4), Tstart = c(0,0,0,0,0.5,0,0,0,0,1),
+                               Tstop = c(0.8,0.8,0.5,0.5,1.2,1.3,1.3,1,1,1.1),
+                               duration = c(0.8,0.8,0.5,0.5,0.7,1.3,1.3,1,1,0.1),
+                               from = c(1,1,1,1,2,1,1,1,1,2), to = c(2,3,2,3,3,2,3,2,3,3),
+                               status = c(0,1,1,0,1,0,0,1,0,0), trans = c(1,2,1,2,3,1,2,1,2,3),
+                               recruitment_date = c(0,0,0.3,0.3,0.3,0.7,0.7,0.9,0.9,0.9))
+execution_mvoslr(msm_data_example, analysis_dates = analysis_dates_example, current_analysis = 2,
+                 transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
+                 model_type = model_type_example, events = events_example)
 }
