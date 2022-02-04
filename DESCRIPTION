@@ -16,7 +16,9 @@ Depends:
   R (>= 4.1.0)
 Imports:
     mstate,
-    rpact
+    stats,
+    rpact,
+    fitdistrplus
 License: AGPL (>= 3)
 Encoding: UTF-8
 LazyData: true
