@@ -122,6 +122,7 @@ simulate_msm <- function(transition_matrix, model_type, cum_hazards_frame, sampl
 #'   \item Tstart - Start of the observation period for this transition
 #'   \item Tstop - Stop of the observation period for this transition
 #'   \item status - Transition could (1) or could not be (0) observed
+#'   \item (recruitment_date) - If a recruitment date is supplied, it will be used to create corresponding censoring
 #' }
 #' @param accrual_duration Accrual duration of the trial to be simulated
 #' @param follow_up_duration Duration of the follow-up period of the trial to be simulated
@@ -139,13 +140,16 @@ msm_to_trial_data <- function(msm_data, accrual_duration, follow_up_duration){
 
   sample_size <- length(unique(msm_data$id))
 
-  recruitment_dates <- runif(n = sample_size,
-                             min = 0,
-                             max = accrual_duration)
+  if(is.null(msm_data$recruitment_date)){
+    recruitment_dates <- runif(n = sample_size,
+                               min = 0,
+                               max = accrual_duration)
 
-  ids_occurences <- table(msm_data$id)
-  msm_data$recruitment_date <- rep(recruitment_dates,
-                                   ids_occurences)
+    ids_occurences <- table(msm_data$id)
+    msm_data$recruitment_date <- rep(recruitment_dates,
+                                     ids_occurences)
+  }
+
   msm_data$censoring_date <- accrual_duration + follow_up_duration - msm_data$recruitment_date
   msm_data$status <- msm_data$status * (msm_data$Tstop <= msm_data$censoring_date)
 

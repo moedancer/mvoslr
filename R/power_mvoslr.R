@@ -85,11 +85,8 @@ power_mvoslr <- function(transition_matrix, model_type, events, cum_hazard_funct
   }
 
   # Discretize hazards under planning alternative for simulation with mstate
-  time <- seq(0, final_analysis, final_analysis/time_steps)
-
-  cumhaz_alternative <- data.frame(time = rep(time, 3),
-                                   Haz = unlist(lapply(cum_hazard_functions_alternative, function(x) x(time))),
-                                   trans = rep(1:num_transitions, each = time_steps + 1))
+  cumhaz_alternative <- discretize_functions(cum_hazard_functions_alternative,
+                                             final_analysis, time_steps = time_steps)
 
   # Collect stagewise p-values, overall decisions, rejection stages and (raw) stagewise test-statistics
   p_collection <- matrix(NA, ncol = num_analyses, nrow = simulation_runs)
@@ -99,45 +96,10 @@ power_mvoslr <- function(transition_matrix, model_type, events, cum_hazard_funct
 
   for(i in 1:simulation_runs){
 
-    # simulation might fail for unknown reasons, repeat simulation function until it does not fail
-    successful_simulation <- FALSE
-    while(!successful_simulation){
-      if(model_type == "M"){
-        sim_data <- try(mstate::mssample(Haz = cumhaz_alternative,
-                                         trans = transition_matrix,
-                                         M = sample_size,
-                                         output = "data"), silent = TRUE)
-      } else if(model_type == "SM"){
-        sim_data <- try(mstate::mssample(Haz = cumhaz_alternative,
-                                         trans = transition_matrix,
-                                         M = sample_size,
-                                         clock = "reset",
-                                         output = "data"), silent = TRUE)
-      }
-      if (class(sim_data) != "try-error") successful_simulation <- TRUE
-    }
+    sim_frame <- simulate_msm(transition_matrix, model_type, cumhaz_alternative, sample_size)
 
-    ### Step 6: Transform simulation results
-
-    sim_frame <- msdata_to_df(sim_data)
-
-    ### Step 7: Simulate recruitment dates, append to simulation results, adapt observations according to censoring
-
-    recruitment_dates <- runif(n = sample_size,
-                               min = 0,
-                               max = accrual_duration)
-
-    ids_occurences <- table(sim_frame$id)
-    sim_frame$recruitment_date <- rep(recruitment_dates,
-                                      ids_occurences)
-    sim_frame$censoring_date <- final_analysis - sim_frame$recruitment_date
-    sim_frame$status <- sim_frame$status * (sim_frame$Tstop <= sim_frame$censoring_date)
-
-    #adapt end and duration of observation period according to censoring
-    sim_frame$Tstop <- pmin(sim_frame$Tstop, sim_frame$censoring_date)
-    sim_frame$duration <- sim_frame$Tstop - sim_frame$Tstart
-
-    sim_frame$censoring_date <- NULL
+    sim_frame <- msm_to_trial_data(sim_frame, accrual_duration,
+                                   final_analysis - accrual_duration)
 
     result <- execution_mvoslr(msm_data = sim_frame, analysis_dates = analysis_dates, current_analysis = num_analyses,
                                transition_matrix = transition_matrix, cum_hazard_functions = cum_hazard_functions_h0,
