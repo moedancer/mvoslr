@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' rate <- 1
-#' reference_ch_fct <- get_cum_haz_fct_exp(rate)
+#' reference_ch_fct <- mvoslr:::get_cum_haz_fct_exp(rate)
 get_cum_haz_fct_exp <- function(rate){
 
   rate <- unname(rate)
@@ -28,7 +28,7 @@ get_cum_haz_fct_exp <- function(rate){
 #' @examples
 #' shape <- 1.5
 #' scale <- 1
-#' reference_ch_fct <- get_cum_haz_fct_weibull(c(shape, scale))
+#' reference_ch_fct <- mvoslr:::get_cum_haz_fct_weibull(c(shape, scale))
 get_cum_haz_fct_weibull <- function(parameters){
 
   parameters <- unname(parameters)
@@ -83,11 +83,11 @@ discretize_functions <- function(function_list, max_argument, time_steps = 100){
 #' cumhaz_13_example <- function(t) t^1.2
 #' cumhaz_23_example <- function(t) t^0.9
 #' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
-#' disc_cum_hazards_frame <- discretize_functions(cum_hazards_example,
-#'                                                max_argument = 10, time_steps = 1000)
+#' disc_cum_hazards_frame <- mvoslr:::discretize_functions(cum_hazards_example,
+#'                                                         max_argument = 10, time_steps = 1000)
 #' sample_size_example <- 100
-#' simulate_msm(transition_matrix = tmat_example, model_type = "M",
-#'              cum_hazards_frame = disc_cum_hazards_frame, sample_size = 10)
+#' mvoslr:::simulate_msm(transition_matrix = tmat_example, model_type = "M",
+#'                       cum_hazards_frame = disc_cum_hazards_frame, sample_size = 10)
 simulate_msm <- function(transition_matrix, model_type, cum_hazards_frame, sample_size){
 
   # Simulate multi-state data with mstate
@@ -136,7 +136,7 @@ simulate_msm <- function(transition_matrix, model_type, cum_hazards_frame, sampl
 #' raw_msm_data_example <- data.frame(id = c(1,1,2,2,2,3,3,4,4,4), Tstart = c(0,0,0,0,0.5,0,0,0,0,1),
 #'                                    Tstop = c(0.8,0.8,0.5,0.5,1.2,1.3,1.3,1,1,1.1),
 #'                                    status = c(0,1,1,0,1,0,0,1,0,0))
-#' msm_to_trial_data(raw_msm_data_example, accrual_duration = 1, follow_up_duration = 0.5)
+#' mvoslr:::msm_to_trial_data(raw_msm_data_example, accrual_duration = 1, follow_up_duration = 0.5)
 msm_to_trial_data <- function(msm_data, accrual_duration, follow_up_duration){
 
   sample_size <- length(unique(msm_data$id))

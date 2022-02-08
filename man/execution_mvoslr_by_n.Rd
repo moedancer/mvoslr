@@ -37,6 +37,8 @@ Maximum number of sample sizes under consideration should be at most the number 
 
 \item{analysis_dates}{Vector of calendar dates of analyses}
 
+\item{accrual_duration}{Duration of accrual period}
+
 \item{current_analysis}{Number of the current analysis}
 
 \item{transition_matrix}{Matrix of transitions between states as in mstate package}
