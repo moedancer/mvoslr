@@ -124,7 +124,8 @@ fit_tihmm <- function(msm_data, transition_matrix, joint_shape = TRUE){
 #'                                from = c(1,1,1,1,2,1,1,1,1,2), to = c(2,3,2,3,3,2,3,2,3,3),
 #'                                status = c(0,1,1,0,1,0,0,1,0,0), trans = c(1,2,1,2,3,1,2,1,2,3),
 #'                                recruitment_date = c(0,0,0.3,0.3,0.3,0.7,0.7,0.9,0.9,0.9))
-#' log_lik_single_obs_tihmm(msm_data_example[1,], shape = 1.5, scales = c(0.4, 0.2, 0.5))
+#' mvoslr:::log_lik_single_obs_tihmm(msm_data_example[1,], shapes = 1.5, scales = c(0.4, 0.2, 0.5),
+#'                                   joint_shape = TRUE)
 log_lik_single_obs_tihmm <- function(single_obs_data, shapes, scales, joint_shape){
 
   trans <- single_obs_data["trans"][[1]]

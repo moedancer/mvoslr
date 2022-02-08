@@ -17,6 +17,6 @@ Helper function to create cumulative hazard function for exponential distributio
 }
 \examples{
 rate <- 1
-reference_ch_fct <- get_cum_haz_fct_exp(rate)
+reference_ch_fct <- mvoslr:::get_cum_haz_fct_exp(rate)
 }
 \keyword{internal}

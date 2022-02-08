@@ -18,6 +18,6 @@ Helper function to create cumulative hazard function for exponential distributio
 \examples{
 shape <- 1.5
 scale <- 1
-reference_ch_fct <- get_cum_haz_fct_weibull(c(shape, scale))
+reference_ch_fct <- mvoslr:::get_cum_haz_fct_weibull(c(shape, scale))
 }
 \keyword{internal}

@@ -30,6 +30,6 @@ Transform raw multi-state model data to trial data using simple censoring mechan
 raw_msm_data_example <- data.frame(id = c(1,1,2,2,2,3,3,4,4,4), Tstart = c(0,0,0,0,0.5,0,0,0,0,1),
                                    Tstop = c(0.8,0.8,0.5,0.5,1.2,1.3,1.3,1,1,1.1),
                                    status = c(0,1,1,0,1,0,0,1,0,0))
-msm_to_trial_data(raw_msm_data_example, accrual_duration = 1, follow_up_duration = 0.5)
+mvoslr:::msm_to_trial_data(raw_msm_data_example, accrual_duration = 1, follow_up_duration = 0.5)
 }
 \keyword{internal}

@@ -28,10 +28,10 @@ cumhaz_12_example <- function(t) t^1.1
 cumhaz_13_example <- function(t) t^1.2
 cumhaz_23_example <- function(t) t^0.9
 cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
-disc_cum_hazards_frame <- discretize_functions(cum_hazards_example,
-                                               max_argument = 10, time_steps = 1000)
+disc_cum_hazards_frame <- mvoslr:::discretize_functions(cum_hazards_example,
+                                                        max_argument = 10, time_steps = 1000)
 sample_size_example <- 100
-simulate_msm(transition_matrix = tmat_example, model_type = "M",
-             cum_hazards_frame = disc_cum_hazards_frame, sample_size = 10)
+mvoslr:::simulate_msm(transition_matrix = tmat_example, model_type = "M",
+                      cum_hazards_frame = disc_cum_hazards_frame, sample_size = 10)
 }
 \keyword{internal}
