@@ -7,6 +7,7 @@
 execution_mvoslr_by_n(
   msm_data,
   analysis_dates,
+  accrual_duration,
   current_analysis = NULL,
   transition_matrix,
   cum_hazard_functions,
