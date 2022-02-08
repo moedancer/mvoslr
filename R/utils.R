@@ -52,7 +52,7 @@ get_cum_haz_fct_weibull <- function(parameters){
 #' f2 <- function(t) t^0.9
 #' f3 <- function(t) t^1.2
 #' function_list_example <- list(f1, f2, f3)
-#' discretize_functions(function_list_example, max_argument = 10, time_steps = 1000)
+#' mvoslr:::discretize_functions(function_list_example, max_argument = 10, time_steps = 1000)
 discretize_functions <- function(function_list, max_argument, time_steps = 100){
 
   args <- seq(0, max_argument, max_argument/time_steps)
