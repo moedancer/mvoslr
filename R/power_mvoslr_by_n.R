@@ -110,7 +110,8 @@ power_mvoslr_by_n <- function(transition_matrix, model_type, events, cum_hazard_
                                    final_analysis - accrual_duration)
 
     # Collect results of simulated trial
-    result <- execution_mvoslr_by_n(msm_data = sim_frame, analysis_dates = analysis_dates, current_analysis = num_analyses,
+    result <- execution_mvoslr_by_n(msm_data = sim_frame, analysis_dates = analysis_dates, accrual_duration = accrual_duration,
+                                    current_analysis = num_analyses,
                                     transition_matrix = transition_matrix, cum_hazard_functions = cum_hazard_functions_h0,
                                     model_type = model_type, events = events, sample_sizes = sample_sizes,
                                     norm = norm, boundaries = boundaries, alpha = alpha, weights = weights)

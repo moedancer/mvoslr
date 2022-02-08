@@ -65,6 +65,8 @@ execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_u
     number_event_types       <- length(events)
     number_of_analyses       <- length(interim_analysis_dates) + 1 # Note: time of final analysis is not fixed here!
 
+    longest_accrual <- max(accrual_durations)
+
     transitions <- mstate::to.trans2(transition_matrix)
     number_of_trans <- dim(transitions)[1]
 
@@ -105,22 +107,8 @@ execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_u
       analysis_date <- interim_analysis_dates[number_of_analysis]
 
       # Introduce "..._temp" data.frame as each analysis implies different censoring pattern
-      msm_data_temp <- msm_data
-
-      msm_data_temp$censoring_date <- analysis_date - msm_data$recruitment_date
-
-      # Exclude patients which were not recruited at date of analysis
-      msm_data_temp <- msm_data_temp[which(msm_data_temp$censoring_date >= 0), ]
-
-      # Exclude observations starting after censoring
-      msm_data_temp <- msm_data_temp[which(msm_data_temp$Tstart <= msm_data_temp$censoring_date), ]
-
-      # Adapt status of transitions according to censoring
-      msm_data_temp$status <- msm_data_temp$status * (msm_data_temp$Tstop <= msm_data_temp$censoring_date)
-
-      # Adapt end and duration of observation period according to censoring
-      msm_data_temp$Tstop <- pmin(msm_data_temp$Tstop, msm_data_temp$censoring_date)
-      msm_data_temp$duration <- msm_data_temp$Tstop - msm_data_temp$Tstart
+      msm_data_temp <- msm_to_trial_data(msm_data, longest_accrual,
+                                         max(analysis_date - longest_accrual,0))
 
       # Calculate accumulated hazards for each transition
       # Create column to enter accumulated hazards
@@ -237,22 +225,8 @@ execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_u
         analysis_date <- accrual_durations[a_index] + follow_up
 
         # Introduce "..._temp" data.frame as each analysis implies different censoring pattern
-        msm_data_temp <- msm_data
-
-        msm_data_temp$censoring_date <- analysis_date - msm_data$recruitment_date
-
-        # Exclude patients which were not recruited at date of analysis
-        msm_data_temp <- msm_data_temp[which(msm_data_temp$censoring_date >= 0), ]
-
-        # Exclude observations starting after censoring
-        msm_data_temp <- msm_data_temp[which(msm_data_temp$Tstart <= msm_data_temp$censoring_date), ]
-
-        # Adapt status of transitions according to censoring
-        msm_data_temp$status <- msm_data_temp$status * (msm_data_temp$Tstop <= msm_data_temp$censoring_date)
-
-        # Adapt end and duration of observation period according to censoring
-        msm_data_temp$Tstop <- pmin(msm_data_temp$Tstop, msm_data_temp$censoring_date)
-        msm_data_temp$duration <- msm_data_temp$Tstop - msm_data_temp$Tstart
+        msm_data_temp <- msm_to_trial_data(msm_data, accrual_durations[a_index],
+                                           follow_up)
 
         # Calculate accumulated hazards for each transition
         # Create column to enter accumulated hazards

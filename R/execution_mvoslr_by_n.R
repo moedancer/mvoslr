@@ -40,7 +40,7 @@
 #'
 #' @import stats
 #'
-execution_mvoslr_by_n <- function(msm_data, analysis_dates, current_analysis = NULL, transition_matrix, cum_hazard_functions,
+execution_mvoslr_by_n <- function(msm_data, analysis_dates, accrual_duration, current_analysis = NULL, transition_matrix, cum_hazard_functions,
                                   model_type, events, sample_sizes, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
 
   # Check some arguments of the function
@@ -109,22 +109,8 @@ execution_mvoslr_by_n <- function(msm_data, analysis_dates, current_analysis = N
       analysis_date <- analysis_dates[number_of_analysis]
 
       # Introduce "..._temp" data.frame as each analysis implies different censoring pattern
-      msm_data_temp <- msm_data
-
-      msm_data_temp$censoring_date <- analysis_date - msm_data$recruitment_date
-
-      # Exclude patients which were not recruited at date of analysis
-      msm_data_temp <- msm_data_temp[which(msm_data_temp$censoring_date >= 0), ]
-
-      # Exclude observations starting after censoring
-      msm_data_temp <- msm_data_temp[which(msm_data_temp$Tstart <= msm_data_temp$censoring_date), ]
-
-      # Adapt status of transitions according to censoring
-      msm_data_temp$status <- msm_data_temp$status * (msm_data_temp$Tstop <= msm_data_temp$censoring_date)
-
-      # Adapt end and duration of observation period according to censoring
-      msm_data_temp$Tstop <- pmin(msm_data_temp$Tstop, msm_data_temp$censoring_date)
-      msm_data_temp$duration <- msm_data_temp$Tstop - msm_data_temp$Tstart
+      msm_data_temp <- msm_to_trial_data(msm_data, accrual_duration,
+                                         max(analysis_date - accrual_duration, 0))
 
       # Calculate accumulated hazards for each transition
       # Create column to enter accumulated hazards

@@ -148,6 +148,8 @@ msm_to_trial_data <- function(msm_data, accrual_duration, follow_up_duration){
     ids_occurences <- table(msm_data$id)
     msm_data$recruitment_date <- rep(recruitment_dates,
                                      ids_occurences)
+  } else {
+    msm_data <- msm_data[which(msm_data$recruitment_dates <= accrual_duration),]
   }
 
   msm_data$censoring_date <- accrual_duration + follow_up_duration - msm_data$recruitment_date

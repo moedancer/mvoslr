@@ -61,6 +61,8 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
     number_event_types       <- length(events)
     number_of_analyses       <- length(analysis_dates)
 
+    longest_accrual <- max(accrual_durations)
+
     transitions <- mstate::to.trans2(transition_matrix)
     number_of_trans <- dim(transitions)[1]
 
@@ -99,22 +101,8 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
       analysis_date <- analysis_dates[number_of_analysis]
 
       # Introduce "..._temp" data.frame as each analysis implies different censoring pattern
-      msm_data_temp <- msm_data
-
-      msm_data_temp$censoring_date <- analysis_date - msm_data$recruitment_date
-
-      # Exclude patients which were not recruited at date of analysis
-      msm_data_temp <- msm_data_temp[which(msm_data_temp$censoring_date >= 0), ]
-
-      # Exclude observations starting after censoring
-      msm_data_temp <- msm_data_temp[which(msm_data_temp$Tstart <= msm_data_temp$censoring_date), ]
-
-      # Adapt status of transitions according to censoring
-      msm_data_temp$status <- msm_data_temp$status * (msm_data_temp$Tstop <= msm_data_temp$censoring_date)
-
-      # Adapt end and duration of observation period according to censoring
-      msm_data_temp$Tstop <- pmin(msm_data_temp$Tstop, msm_data_temp$censoring_date)
-      msm_data_temp$duration <- msm_data_temp$Tstop - msm_data_temp$Tstart
+      msm_data_temp <- msm_to_trial_data(msm_data, longest_accrual,
+                                         max(analysis_date - longest_accrual,0))
 
       # Calculate accumulated hazards for each transition
       # Create column to enter accumulated hazards
