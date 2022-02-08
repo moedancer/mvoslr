@@ -24,6 +24,6 @@ f1 <- function(t) t^1.1
 f2 <- function(t) t^0.9
 f3 <- function(t) t^1.2
 function_list_example <- list(f1, f2, f3)
-discretize_functions(function_list_example, max_argument = 10, time_steps = 1000)
+mvoslr:::discretize_functions(function_list_example, max_argument = 10, time_steps = 1000)
 }
 \keyword{internal}

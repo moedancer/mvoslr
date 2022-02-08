@@ -18,6 +18,7 @@
 #' }
 #' Maximum number of sample sizes under consideration should be at most the number of subjects in this data set
 #' @param analysis_dates Vector of calendar dates of analyses
+#' @param accrual_duration Duration of accrual period
 #' @param current_analysis Number of the current analysis
 #' @param transition_matrix Matrix of transitions between states as in mstate package
 #' @param cum_hazard_functions Cumulative hazard functions for transitions in this model

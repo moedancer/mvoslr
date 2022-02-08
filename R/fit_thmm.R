@@ -56,7 +56,7 @@ fit_thmm <- function(msm_data, transition_matrix){
   agg_data$rates <- agg_data$status/agg_data$duration
 
   # Extract required parameter estimates
-  parameter_estimates <- agg_data[which(agg_data$trans %in% transitions$transno), rates]
+  parameter_estimates <- agg_data[which(agg_data$trans %in% transitions$transno), "rates"]
   names(parameter_estimates) <- agg_data$trans[agg_data$trans %in% transitions$transno]
 
   cum_hazard_functions <- lapply(parameter_estimates,

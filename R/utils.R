@@ -58,7 +58,7 @@ discretize_functions <- function(function_list, max_argument, time_steps = 100){
   args <- seq(0, max_argument, max_argument/time_steps)
 
   values_frame <- data.frame(time = rep(args, length(function_list)),
-                             Haz = unlist(lapply(function_list, function(x) x(time))),
+                             Haz = unlist(lapply(function_list, function(x) x(args))),
                              trans = rep(1:length(function_list), each = time_steps + 1))
 
   return(values_frame)
@@ -83,7 +83,8 @@ discretize_functions <- function(function_list, max_argument, time_steps = 100){
 #' cumhaz_13_example <- function(t) t^1.2
 #' cumhaz_23_example <- function(t) t^0.9
 #' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
-#' disc_cum_hazards_frame <- discretize_functions(cum_hazards_example, max_argument = 10, time_steps = 1000)
+#' disc_cum_hazards_frame <- discretize_functions(cum_hazards_example,
+#'                                                max_argument = 10, time_steps = 1000)
 #' sample_size_example <- 100
 #' simulate_msm(transition_matrix = tmat_example, model_type = "M",
 #'              cum_hazards_frame = disc_cum_hazards_frame, sample_size = 10)
