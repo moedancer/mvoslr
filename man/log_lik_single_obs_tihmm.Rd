@@ -26,6 +26,7 @@ msm_data_example <- data.frame(id = c(1,1,2,2,2,3,3,4,4,4), Tstart = c(0,0,0,0,0
                                from = c(1,1,1,1,2,1,1,1,1,2), to = c(2,3,2,3,3,2,3,2,3,3),
                                status = c(0,1,1,0,1,0,0,1,0,0), trans = c(1,2,1,2,3,1,2,1,2,3),
                                recruitment_date = c(0,0,0.3,0.3,0.3,0.7,0.7,0.9,0.9,0.9))
-log_lik_single_obs_tihmm(msm_data_example[1,], shape = 1.5, scales = c(0.4, 0.2, 0.5))
+mvoslr:::log_lik_single_obs_tihmm(msm_data_example[1,], shapes = 1.5, scales = c(0.4, 0.2, 0.5),
+                                  joint_shape = TRUE)
 }
 \keyword{internal}

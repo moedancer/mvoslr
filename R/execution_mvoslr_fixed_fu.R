@@ -107,8 +107,9 @@ execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_u
       analysis_date <- interim_analysis_dates[number_of_analysis]
 
       # Introduce "..._temp" data.frame as each analysis implies different censoring pattern
-      msm_data_temp <- msm_to_trial_data(msm_data, longest_accrual,
-                                         max(analysis_date - longest_accrual,0))
+      msm_data_temp <- msm_to_trial_data(msm_data, min(analysis_date, longest_accrual),
+                                         ifelse(longest_accrual > analysis_date,
+                                                0, analysis_date - longest_accrual))
 
       # Calculate accumulated hazards for each transition
       # Create column to enter accumulated hazards
@@ -172,7 +173,7 @@ execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_u
             event_times <- event_times[order(event_times$id),]
 
             # Extract observations until occurence of event
-            event_times_rep <-  event_times$Tstop[relevant_obs$id]
+            event_times_rep <-  event_times$Tstop[match(relevant_obs$id, event_times$id)]
 
             for(a_index in 1:number_accrual_durations){
 
@@ -290,7 +291,7 @@ execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_u
               event_times <- event_times[order(event_times$id),]
 
               # Extract observations until occurence of event
-              event_times_rep <-  event_times$Tstop[relevant_obs$id]
+              event_times_rep <-  event_times$Tstop[match(relevant_obs$id, event_times$id)]
 
               # Need "_temp" object for computation for different accrual durations
               # Note: we are interested in the history of the joint (intersection) event before union event

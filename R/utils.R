@@ -77,6 +77,7 @@ discretize_functions <- function(function_list, max_argument, time_steps = 100){
 #' @keywords internal
 #'
 #' @examples
+#' library(mstate)
 #' tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
 #' model_type_example <- "SM"
 #' cumhaz_12_example <- function(t) t^1.1
@@ -150,7 +151,7 @@ msm_to_trial_data <- function(msm_data, accrual_duration, follow_up_duration){
     msm_data$recruitment_date <- rep(recruitment_dates,
                                      ids_occurences)
   } else {
-    msm_data <- msm_data[which(msm_data$recruitment_dates <= accrual_duration),]
+    msm_data <- msm_data[which(msm_data$recruitment_date <= accrual_duration),]
   }
 
   msm_data$censoring_date <- accrual_duration + follow_up_duration - msm_data$recruitment_date

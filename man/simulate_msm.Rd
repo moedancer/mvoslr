@@ -22,6 +22,7 @@ Data frame with results of simulation
 Wrapper function for mstate::mssample with some adjustments
 }
 \examples{
+library(mstate)
 tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
 model_type_example <- "SM"
 cumhaz_12_example <- function(t) t^1.1

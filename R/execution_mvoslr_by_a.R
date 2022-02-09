@@ -41,6 +41,7 @@
 #'
 #' @import stats
 #'
+#' @keywords internal
 execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = NULL, transition_matrix, cum_hazard_functions, model_type,
                                   events, accrual_durations, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
 
@@ -101,8 +102,9 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
       analysis_date <- analysis_dates[number_of_analysis]
 
       # Introduce "..._temp" data.frame as each analysis implies different censoring pattern
-      msm_data_temp <- msm_to_trial_data(msm_data, longest_accrual,
-                                         max(analysis_date - longest_accrual,0))
+      msm_data_temp <- msm_to_trial_data(msm_data, min(analysis_date, longest_accrual),
+                                         ifelse(longest_accrual > analysis_date,
+                                                0, analysis_date - longest_accrual))
 
       # Calculate accumulated hazards for each transition
       # Create column to enter accumulated hazards
