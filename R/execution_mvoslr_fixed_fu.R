@@ -43,6 +43,8 @@
 #'
 #' @import stats
 #'
+#' @keywords internal
+#'
 execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_up, current_analysis = NULL, transition_matrix, cum_hazard_functions, model_type,
                                       events, accrual_durations, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
 

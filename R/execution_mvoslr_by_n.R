@@ -41,6 +41,8 @@
 #'
 #' @import stats
 #'
+#' @keywords internal
+#'
 execution_mvoslr_by_n <- function(msm_data, analysis_dates, accrual_duration, current_analysis = NULL, transition_matrix, cum_hazard_functions,
                                   model_type, events, sample_sizes, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
 

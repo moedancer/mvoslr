@@ -79,7 +79,6 @@ discretize_functions <- function(function_list, max_argument, time_steps = 100){
 #' @examples
 #' library(mstate)
 #' tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
-#' model_type_example <- "SM"
 #' cumhaz_12_example <- function(t) t^1.1
 #' cumhaz_13_example <- function(t) t^1.2
 #' cumhaz_23_example <- function(t) t^0.9
@@ -165,5 +164,40 @@ msm_to_trial_data <- function(msm_data, accrual_duration, follow_up_duration){
   msm_data$censoring_date <- NULL
 
   return(msm_data)
+
+}
+
+#' Transform data of type msdata from mstate package to a data frame
+#'
+#' @param msdata Data set of type msdata from \code{mstate} package
+#'
+#' @return data frame with column names corresponding to the columns names of msdata objects
+#'
+#' @keywords internal
+#'
+#' @examples
+#' library(mstate)
+#' tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
+#' model_type_example <- "SM"
+#' cumhaz_12_example <- function(t) t^1.1
+#' cumhaz_13_example <- function(t) t^1.2
+#' cumhaz_23_example <- function(t) t^0.9
+#' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+#' disc_cum_hazards_frame <- mvoslr:::discretize_functions(cum_hazards_example,
+#'                                                         max_argument = 10, time_steps = 1000)
+#' sim_data <- mstate::mssample(Haz = disc_cum_hazards_frame,
+#'                              trans = tmat_example,
+#'                              M = 10,
+#'                              output = "data")
+#' sim_frame <- msdata_to_df(sim_data)
+msdata_to_df <- function(msdata){
+
+  ms_names <- names(msdata)
+  attributes(msdata) <- NULL
+
+  ms_df <- data.frame(msdata)
+  colnames(ms_df) <- ms_names
+
+  return(ms_df)
 
 }
