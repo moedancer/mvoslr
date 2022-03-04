@@ -83,6 +83,9 @@ test_that("power function with variable accrual duration correctly aggregates re
   cumhaz_13_example <- function(t) t^1.2
   cumhaz_23_example <- function(t) t^0.9
   cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+  reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                                 intensities = cum_hazards_example,
+                                                 type = model_type_example)
   analysis_dates_example <- c(1, 2)
   events_example <- list(c(2,3), c(3))
   names(events_example) <- c("PFS", "OS")
@@ -109,9 +112,8 @@ test_that("power function with variable accrual duration correctly aggregates re
                                    analysis_dates_example[2] - accrual_durations_example[2])
 
   result_1 <- execution_mvoslr_by_a(msm_data = sim_frame_1, analysis_dates = analysis_dates_example,
-                                    current_analysis = 2, transition_matrix = tmat_example,
-                                    cum_hazard_functions = cum_hazards_example,
-                                    model_type = model_type_example, events = events_example,
+                                    current_analysis = 2, reference_model = reference_model_example,
+                                    events = events_example,
                                     accrual_durations = accrual_durations_example)
 
   decision_1_long <- !is.na(result_1$rejection_stage[1])
@@ -122,9 +124,8 @@ test_that("power function with variable accrual duration correctly aggregates re
                                    analysis_dates_example[2] - accrual_durations_example[2])
 
   result_2 <- execution_mvoslr_by_a(msm_data = sim_frame_2, analysis_dates = analysis_dates_example,
-                                    current_analysis = 2, transition_matrix = tmat_example,
-                                    cum_hazard_functions = cum_hazards_example,
-                                    model_type = model_type_example, events = events_example,
+                                    current_analysis = 2, reference_model = reference_model_example,
+                                    events = events_example,
                                     accrual_durations = accrual_durations_example)
 
   decision_2_long <- !is.na(result_2$rejection_stage[1])
@@ -135,9 +136,8 @@ test_that("power function with variable accrual duration correctly aggregates re
                                    analysis_dates_example[2] - accrual_durations_example[2])
 
   result_3 <- execution_mvoslr_by_a(msm_data = sim_frame_3, analysis_dates = analysis_dates_example,
-                                    current_analysis = 2, transition_matrix = tmat_example,
-                                    cum_hazard_functions = cum_hazards_example,
-                                    model_type = model_type_example, events = events_example,
+                                    current_analysis = 2, reference_model = reference_model_example,
+                                    events = events_example,
                                     accrual_durations = accrual_durations_example)
 
   decision_3_long <- !is.na(result_3$rejection_stage[1])
@@ -147,8 +147,8 @@ test_that("power function with variable accrual duration correctly aggregates re
   (result_1$raw_martingale[,,1] + result_2$raw_martingale[,,1] + result_3$raw_martingale[,,1])/3
   (result_1$raw_martingale[,,2] + result_2$raw_martingale[,,2] + result_3$raw_martingale[,,2])/3
 
-  power_result <- power_mvoslr_by_a(transition_matrix = tmat_example, model_type = model_type_example,
-                                    events = events_example, cum_hazard_functions_h0 = cum_hazards_example,
+  power_result <- power_mvoslr_by_a(reference_model = reference_model_example,
+                                    events = events_example,
                                     analysis_dates = analysis_dates_example,
                                     accrual_durations = accrual_durations_example, recruitment_speed = recruitment_speed_example,
                                     hazard_ratios = hazard_ratios_example, simulation_runs = 3)

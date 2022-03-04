@@ -9,9 +9,7 @@ execution_mvoslr_by_a(
   msm_data,
   analysis_dates,
   current_analysis = NULL,
-  transition_matrix,
-  cum_hazard_functions,
-  model_type,
+  reference_model,
   events,
   accrual_durations,
   norm = "l2",
@@ -39,11 +37,7 @@ Maximum number of sample sizes under consideration should be at most the number 
 
 \item{current_analysis}{Number of the current analysis}
 
-\item{transition_matrix}{Matrix of transitions between states as in mstate package}
-
-\item{cum_hazard_functions}{Cumulative hazard functions for transitions in this model}
-
-\item{model_type}{Reference multi-state model is either Markov (\code{model_type = "M"}) or Semi-Markov (\code{model_type = "SM"})}
+\item{reference_model}{Specification of the reference model against which the new data is tested. Should be an object of class "reference_model"}
 
 \item{events}{List of (composite) events that shall be investigated}
 

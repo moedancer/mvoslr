@@ -5,10 +5,8 @@
 \title{Estimation of power of group-sequential multivariate one-sample log-rank test via simulation with varying accrual durations}
 \usage{
 power_mvoslr_by_a(
-  transition_matrix,
-  model_type,
+  reference_model,
   events,
-  cum_hazard_functions_h0,
   analysis_dates,
   accrual_durations,
   recruitment_speed,
@@ -23,13 +21,9 @@ power_mvoslr_by_a(
 )
 }
 \arguments{
-\item{transition_matrix}{Matrix of transitions between states as in mstate package}
-
-\item{model_type}{Reference multi-state model is either Markov (\code{model_type = "M"}) or Semi-Markov (\code{model_type = "SM"})}
+\item{reference_model}{Specification of the reference model against which the new data is tested. Should be an object of class "reference_model"}
 
 \item{events}{List of (composite) events that shall be investigated}
-
-\item{cum_hazard_functions_h0}{Cumulative hazard functions for transitions in this model under null hypothesis}
 
 \item{analysis_dates}{Vector of calendar dates of analyses. Calendar date of final analysis is fixed.}
 
@@ -81,6 +75,9 @@ cumhaz_12_example <- function(t) t^1.1
 cumhaz_13_example <- function(t) t^1.2
 cumhaz_23_example <- function(t) t^0.9
 cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                               intensities = cum_hazards_example,
+                                               type = model_type_example)
 analysis_dates_example <- c(1, 2)
 events_example <- list(c(2,3), c(3))
 names(events_example) <- c("PFS", "OS")
@@ -88,8 +85,7 @@ accrual_durations_example <- seq(0.5, 1.5, 0.2)
 recruitment_speed_example <- 100
 #In this example, the alternative is specified via separate hazard ratios for each transition
 hazard_ratios_example <- c(1.4, 1.2, 1.35)
-power_mvoslr_by_a(transition_matrix = tmat_example, model_type = model_type_example,
-                  events = events_example, cum_hazard_functions_h0 = cum_hazards_example,
+power_mvoslr_by_a(reference_model = reference_model_example, events = events_example,
                   analysis_dates = analysis_dates_example,
                   accrual_durations = accrual_durations_example,
                   recruitment_speed = recruitment_speed_example,

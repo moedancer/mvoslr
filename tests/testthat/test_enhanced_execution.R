@@ -80,8 +80,7 @@ test_that("execution for multiple accrual durations has the same outputs as simp
                                             reference_model = reference_model_example, events = events_example)
 
   enhanced_result <- execution_mvoslr_by_a(msm_data = msm_data_example_full, analysis_dates = analysis_dates_example, accrual_durations = c(0.8, 1),
-                                           current_analysis = 2, transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                           model_type = model_type_example, events = events_example)
+                                           current_analysis = 2, reference_model = reference_model_example, events = events_example)
 
   expect_equal(unname(enhanced_result$raw_martingale[,,1]),
                unname(simple_result_reduced$raw_martingale))
