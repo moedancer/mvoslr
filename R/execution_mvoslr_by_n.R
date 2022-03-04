@@ -201,8 +201,13 @@ execution_mvoslr_by_n <- function(msm_data, analysis_dates, accrual_duration, cu
       }
 
       # Compute value of M0 for each event
-      mv_martingale[,number_of_analysis,] <-
-        apply(events_count[,,number_of_analysis,], 3, diag) - apply(events_hazard[,,number_of_analysis,], 3, diag)
+      if(number_sample_sizes > 1){
+        mv_martingale[,number_of_analysis,] <-
+          apply(events_count[,,number_of_analysis,], 3, diag) - apply(events_hazard[,,number_of_analysis,], 3, diag)
+      } else {
+        mv_martingale[,number_of_analysis,] <-
+          diag(events_count[,,number_of_analysis,]) - diag(events_hazard[,,number_of_analysis,])
+      }
 
       # Compute increments of event count and cumulative hazard data and M0
       if(number_of_analysis == 1){

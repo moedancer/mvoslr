@@ -74,3 +74,4 @@ For a given data set, this function can efficiently compute the results of the g
 log-rank test for different choices of sample sizes. This function is needed to efficiently estimate the power of such
 trials for different sample sizes via simulation.
 }
+\keyword{internal}

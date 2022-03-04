@@ -76,3 +76,4 @@ log-rank test for different durations of the accrual duration. Calendar dates of
 date of the final analysis is set to the duration of the follow-up period plus the duration of the respective accrual period.
 This function is needed to efficiently estimate the power of such trials for different sample sizes via simulation.
 }
+\keyword{internal}
