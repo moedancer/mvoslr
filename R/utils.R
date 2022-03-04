@@ -189,7 +189,7 @@ msm_to_trial_data <- function(msm_data, accrual_duration, follow_up_duration){
 #'                              trans = tmat_example,
 #'                              M = 10,
 #'                              output = "data")
-#' sim_frame <- msdata_to_df(sim_data)
+#' sim_frame <- mvoslr:::msdata_to_df(sim_data)
 msdata_to_df <- function(msdata){
 
   ms_names <- names(msdata)
