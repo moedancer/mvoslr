@@ -22,11 +22,7 @@ fit_thmm(msm_data, transition_matrix)
 \item{transition_matrix}{Matrix of transitions between states as in mstate package}
 }
 \value{
-List of 2:
-\itemize{
-\item parameter_estimates - Estimated parameters for each transition
-\item cum_hazard_function - List of cumulative hazard function to be passed to power analysis or execution of multivariate one-sample log-rank test
-}
+Object of type "reference_model" including the estimated parameters
 }
 \description{
 Fitting of time-homogeneous Markov model to (historic) data from multi-state model

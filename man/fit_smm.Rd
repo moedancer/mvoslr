@@ -24,11 +24,7 @@ fit_smm(msm_data, transition_matrix, joint_shape = TRUE)
 \item{joint_shape}{boolean variable indicating whether shape parameter is the same for all transitions (as in Li and Zhang (2015)) or not}
 }
 \value{
-List of 2:
-\itemize{
-\item parameters - Estimated parameters for each transition
-\item cum_hazard_function - List of cumulative hazard function to be passed to power analysis or execution of multivariate one-sample log-rank test
-}
+Object of type "reference_model" including the estimated parameters
 }
 \description{
 Fitting of Semi-Markov model with Weibull transition intensities to (historic) data from multi-state model

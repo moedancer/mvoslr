@@ -14,9 +14,7 @@
 #' }
 #' @param analysis_dates Vector of calendar dates of analyses
 #' @param current_analysis Number of the current analysis
-#' @param transition_matrix Matrix of transitions between states as in mstate package
-#' @param cum_hazard_functions Cumulative hazard functions for transitions in this model
-#' @param model_type Reference multi-state model is either Markov (\code{model_type = "M"}) or Semi-Markov (\code{model_type = "SM"})
+#' @param reference_model Specification of the reference model against which the new data is tested. Should be an object of class "reference_model"
 #' @param events List of (composite) events that shall be investigated
 #' @param norm Use either \eqn{L^2}-norm (\code{norm = "l2"}, default value) or \eqn{L^\infty}-norm (\code{norm = "linf"}) of vector of test statistics to compute stagewise p-values
 #' @param boundaries Use either O'Brien-Fleming'S (\code{boundaries = "obf"}, default value) or Pocock's (\code{boundaries = "pocock"}) sequential decision boundaries
@@ -47,6 +45,9 @@
 #' cumhaz_13_example <- function(t) t^1.2
 #' cumhaz_23_example <- function(t) t^0.9
 #' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+#' reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+#'                                                intensities = cum_hazards_example,
+#'                                                type = model_type_example)
 #' analysis_dates_example <- c(1, 2)
 #' events_example <- list(c(2,3), c(3))
 #' names(events_example) <- c("PFS", "OS")
@@ -60,10 +61,14 @@
 #'                                status = c(0,1,1,0,1,0,0,1,0,0), trans = c(1,2,1,2,3,1,2,1,2,3),
 #'                                recruitment_date = c(0,0,0.3,0.3,0.3,0.7,0.7,0.9,0.9,0.9))
 #' execution_mvoslr(msm_data_example, analysis_dates = analysis_dates_example, current_analysis = 2,
-#'                  transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-#'                  model_type = model_type_example, events = events_example)
-execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, transition_matrix, cum_hazard_functions,
-                             model_type, events, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
+#'                  reference_model = reference_model_example, events = events_example)
+execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, reference_model,
+                             events, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
+
+  # Unpack information from reference model
+  transition_matrix <- reference_model$transition_matrix
+  cum_hazard_functions <- reference_model$intensities
+  model_type <- attributes(reference_model)$type
 
   if(!model_type %in% c("M", "SM")){
     cat("Parameter model needs to be one of \"M\" (Markov model) or \"SM\" (Semi-Markov model)!" )

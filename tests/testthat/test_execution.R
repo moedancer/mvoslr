@@ -9,6 +9,9 @@ test_that("result of execution function of multivariate log-rank test coincides
   cumhaz_13_example <- function(t) t
   cumhaz_23_example <- function(t) sqrt(t)
   cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+  reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                                 intensities = cum_hazards_example,
+                                                 type = model_type_example)
   analysis_dates_example <- c(3, 6)
   events_example <- list(c(2,3), c(3))
   names(events_example) <- c("PFS", "OS")
@@ -48,9 +51,7 @@ test_that("result of execution function of multivariate log-rank test coincides
   result <- execution_mvoslr(msm_data = msm_data,
                              analysis_dates = analysis_dates_example,
                              current_analysis = 2,
-                             transition_matrix = tmat_example,
-                             cum_hazard_functions = cum_hazards_example,
-                             model_type = model_type_example,
+                             reference_model = reference_model_example,
                              events = events_example)
 
   # Equality of of raw multivariate process
@@ -105,6 +106,9 @@ test_that("result of execution function of multivariate log-rank test coincides
                               cumhaz_24_example,
                               cumhaz_32_example,
                               cumhaz_34_example)
+  reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                                 intensities = cum_hazards_example,
+                                                 type = model_type_example)
   analysis_dates_example <- c(2,4,6)
   events_example <- list(c(2,4), c(3,4))
   names(events_example) <- c("Eff", "Tox")
@@ -154,9 +158,7 @@ test_that("result of execution function of multivariate log-rank test coincides
   result <- execution_mvoslr(msm_data = msm_data,
                              analysis_dates = analysis_dates_example,
                              current_analysis = 3,
-                             transition_matrix = tmat_example,
-                             cum_hazard_functions = cum_hazards_example,
-                             model_type = model_type_example,
+                             reference_model = reference_model_example,
                              events = events_example)
 
   # Equality of of raw multivariate process

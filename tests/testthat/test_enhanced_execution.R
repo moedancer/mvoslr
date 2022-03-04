@@ -12,6 +12,9 @@ test_that("execution for multiple sample sizes has the same outputs as simple ev
   cumhaz_13_example <- function(t) t^1.2
   cumhaz_23_example <- function(t) t^0.9
   cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+  reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                                 intensities = cum_hazards_example,
+                                                 type = model_type_example)
   analysis_dates_example <- c(1, 2)
   events_example <- list(c(2,3), c(3))
   names(events_example) <- c("PFS", "OS")
@@ -26,11 +29,9 @@ test_that("execution for multiple sample sizes has the same outputs as simple ev
   msm_data_example_reduced <- msm_data_example_full[which(msm_data_example_full$id %in% 1:3), ]
 
   simple_result_full <- execution_mvoslr(msm_data_example_full, analysis_dates = analysis_dates_example, current_analysis = 2,
-                                         transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                         model_type = model_type_example, events = events_example)
+                                         reference_model = reference_model_example, events = events_example)
   simple_result_reduced <- execution_mvoslr(msm_data_example_reduced, analysis_dates = analysis_dates_example, current_analysis = 2,
-                                            transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                            model_type = model_type_example, events = events_example)
+                                            reference_model = reference_model_example, events = events_example)
 
   # For this test, we need to run 'execution_mvoslr_by_n' separately as subsets are chosen randomly
   enhanced_result_full <- execution_mvoslr_by_n(msm_data = msm_data_example_full, analysis_dates = analysis_dates_example, accrual_duration = 1,
@@ -60,6 +61,9 @@ test_that("execution for multiple accrual durations has the same outputs as simp
   cumhaz_13_example <- function(t) t^1.2
   cumhaz_23_example <- function(t) t^0.9
   cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+  reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                                 intensities = cum_hazards_example,
+                                                 type = model_type_example)
   analysis_dates_example <- c(1, 2)
   events_example <- list(c(2,3), c(3))
   names(events_example) <- c("PFS", "OS")
@@ -73,11 +77,9 @@ test_that("execution for multiple accrual durations has the same outputs as simp
   msm_data_example_reduced <- msm_data_example_full[which(msm_data_example_full$id <= 3), ]
 
   simple_result_full <- execution_mvoslr(msm_data_example_full, analysis_dates = analysis_dates_example, current_analysis = 2,
-                                         transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                         model_type = model_type_example, events = events_example)
+                                         reference_model = reference_model_example, events = events_example)
   simple_result_reduced <- execution_mvoslr(msm_data_example_reduced, analysis_dates = analysis_dates_example, current_analysis = 2,
-                                            transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                            model_type = model_type_example, events = events_example)
+                                            reference_model = reference_model_example, events = events_example)
 
   enhanced_result <- execution_mvoslr_by_a(msm_data = msm_data_example_full, analysis_dates = analysis_dates_example, accrual_durations = c(0.8, 1),
                                            current_analysis = 2, transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
@@ -103,6 +105,9 @@ test_that("execution for multiple accrual durations with fixed follow-up duratio
   cumhaz_13_example <- function(t) t^1.2
   cumhaz_23_example <- function(t) t^0.9
   cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+  reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                                 intensities = cum_hazards_example,
+                                                 type = model_type_example)
   analysis_dates_example <- c(1, 2)
   accrual_durations_example <- c(0.8, 1)
   follow_up_example <- 1
@@ -123,11 +128,9 @@ test_that("execution for multiple accrual durations with fixed follow-up duratio
                                          recruitment_date = c(0,0,0.3,0.3,0.3,0.7,0.7))
 
   simple_result_full <- execution_mvoslr(msm_data_example_full, analysis_dates = analysis_dates_example, current_analysis = 2,
-                                         transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                         model_type = model_type_example, events = events_example)
+                                         reference_model = reference_model_example, events = events_example)
   simple_result_reduced <- execution_mvoslr(msm_data_example_reduced, analysis_dates = analysis_dates_example, current_analysis = 2,
-                                            transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                            model_type = model_type_example, events = events_example)
+                                            reference_model = reference_model_example, events = events_example)
 
   enhanced_result <- execution_mvoslr_fixed_fu(msm_data = msm_data_example_full, interim_analysis_dates = head(analysis_dates_example, -1),
                                                accrual_durations = accrual_durations_example,

@@ -12,6 +12,9 @@ test_that("power function correctly aggregates results from single trials", {
   cumhaz_13_example <- function(t) t^1.2
   cumhaz_23_example <- function(t) t^0.9
   cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+  reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+                                                 intensities = cum_hazards_example,
+                                                 type = model_type_example)
   analysis_dates_example <- c(1, 2)
   events_example <- list(c(2,3), c(3))
   names(events_example) <- c("PFS", "OS")
@@ -35,36 +38,32 @@ test_that("power function correctly aggregates results from single trials", {
   sim_frame_1 <- msm_to_trial_data(sim_frame_1, accrual_duration_example,
                                    analysis_dates_example[2] - accrual_duration_example)
   result_1 <- execution_mvoslr(msm_data = sim_frame_1, analysis_dates = analysis_dates_example,
-                               current_analysis = 2, transition_matrix = tmat_example,
-                               cum_hazard_functions = cum_hazards_example,
-                               model_type = model_type_example, events = events_example)
+                               current_analysis = 2, reference_model = reference_model_example,
+                               events = events_example)
   decision_1 <- !is.na(result_1$rejection_stage)
 
   sim_frame_2 <- simulate_msm(tmat_example, model_type_example, cumhaz_alternative, sample_size_example)
   sim_frame_2 <- msm_to_trial_data(sim_frame_2, accrual_duration_example,
                                    analysis_dates_example[2] - accrual_duration_example)
   result_2 <- execution_mvoslr(msm_data = sim_frame_2, analysis_dates = analysis_dates_example,
-                               current_analysis = 2, transition_matrix = tmat_example,
-                               cum_hazard_functions = cum_hazards_example,
-                               model_type = model_type_example, events = events_example)
+                               current_analysis = 2, reference_model = reference_model_example,
+                               events = events_example)
   decision_2 <- !is.na(result_2$rejection_stage)
 
   sim_frame_3 <- simulate_msm(tmat_example, model_type_example, cumhaz_alternative, sample_size_example)
   sim_frame_3 <- msm_to_trial_data(sim_frame_3, accrual_duration_example,
                                    analysis_dates_example[2] - accrual_duration_example)
   result_3 <- execution_mvoslr(msm_data = sim_frame_3, analysis_dates = analysis_dates_example,
-                               current_analysis = 2, transition_matrix = tmat_example,
-                               cum_hazard_functions = cum_hazards_example,
-                               model_type = model_type_example, events = events_example)
+                               current_analysis = 2, reference_model = reference_model_example,
+                               events = events_example)
   decision_3 <- !is.na(result_3$rejection_stage)
 
   set.seed(my_seed)
 
-  power_result <- power_mvoslr(transition_matrix = tmat_example, model_type = model_type_example,
-                               events = events_example, cum_hazard_functions_h0 = cum_hazards_example,
-                               analysis_dates = analysis_dates_example,
-                               accrual_duration = accrual_duration_example, sample_size = sample_size_example,
-                               hazard_ratios = hazard_ratios_example, simulation_runs = 3)
+  power_result <- power_mvoslr(reference_model = reference_model_example, events = events_example,
+                               analysis_dates = analysis_dates_example, accrual_duration = accrual_duration_example,
+                               sample_size = sample_size_example, hazard_ratios = hazard_ratios_example,
+                               simulation_runs = 3)
 
   expect_equal(unname((result_1$raw_martingale + result_2$raw_martingale + result_3$raw_martingale)/3),
                power_result$means)
