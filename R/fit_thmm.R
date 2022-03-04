@@ -45,6 +45,8 @@ fit_thmm <- function(msm_data, transition_matrix){
         setdiff(transitions$transno, unique(msm_data$trans)), ".", sep = "")
   }
 
+  num_trans <- dim(transitions)[1]
+
   # Aggregate time spent waiting for each transition and number of transitions
   agg_time   <- aggregate(duration ~ trans, data = msm_data, FUN = sum)
   agg_events <- aggregate(status ~ trans, data = msm_data, FUN = sum)
@@ -59,12 +61,14 @@ fit_thmm <- function(msm_data, transition_matrix){
   parameter_estimates <- agg_data[which(agg_data$trans %in% transitions$transno), "rates"]
   names(parameter_estimates) <- agg_data$trans[agg_data$trans %in% transitions$transno]
 
-  cum_hazard_functions <- lapply(parameter_estimates,
-                                 FUN = get_cum_haz_fct_exp)
+  # Transform parameters estimates to Weibull form
+  parameter_estimates_weibull <- rbind(rep(1, num_trans), 1/parameter_estimates)
+  rownames(parameter_estimates_weibull) <- c("shape", "scale")
 
-  output <- list(parameter_estimates,
-                 cum_hazard_functions)
+  output_model <- reference_model_weibull(transition_matrix = transition_matrix,
+                                          type = "M",
+                                          parameters = parameter_estimates_weibull)
 
-  return(output)
+  return(output_model)
 
 }

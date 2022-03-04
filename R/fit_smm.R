@@ -86,17 +86,11 @@ fit_smm <- function(msm_data, transition_matrix, joint_shape = TRUE){
 
   }
 
-  # Convert parameter collection to list for creation of cumulative hazard functions
-  parameter_estimates_list <- lapply(1:ncol(parameter_estimates),
-                                     function(col_number) parameter_estimates[, col_number])
+  output_model <- reference_model_weibull(transition_matrix = transition_matrix,
+                                          type = "SM",
+                                          parameters = parameter_estimates)
 
-  cum_hazard_functions <- lapply(parameter_estimates_list,
-                                 FUN = get_cum_haz_fct_weibull)
-
-  output <- list(parameter_estimates,
-                 cum_hazard_functions)
-
-  return(output)
+  return(output_model)
 
 }
 
