@@ -127,7 +127,9 @@ power_mvoslr_by_a <- function(transition_matrix, model_type, events, cum_hazard_
 
   # calculate means over simulation runs
   power <- apply(decision_collection, 2, mean)
-  rejection_stages <- apply(rejection_stage_collection, 2, function(stages){table(stages, exclude = NULL)/simulation_runs})
+  rejection_stage_collection[is.na(rejection_stage_collection)] <- 0
+  rejection_stages <- apply(rejection_stage_collection, 2,
+                            function(stages){table(factor(stages, levels = 0:num_analyses), exclude = NULL)/simulation_runs})
 
   # Helper function to combine overview over rejection stages for different accrual lengths into one matrix
   custom_rbind <- function(data_a, data_b){
@@ -156,7 +158,7 @@ power_mvoslr_by_a <- function(transition_matrix, model_type, events, cum_hazard_
     rejection_stages <- t(rejection_stages)
     rejection_stages <- rejection_stages[sort(rownames(rejection_stages)), ]
   } else {
-    rownames(rejection_stages) <- replace(rownames(rejection_stages), which(is.na(rownames(rejection_stages))), "Acceptance")
+    rownames(rejection_stages) <- replace(rownames(rejection_stages), which(rownames(rejection_stages) == 0), "Acceptance")
   }
 
   # Compute means of raw martingales for each analysis and choice of accrual period
