@@ -1,9 +1,7 @@
 #' Estimation of power of group-sequential multivariate one-sample log-rank test via simulation with varying sample size
 #'
-#' @param transition_matrix Matrix of transitions between states as in mstate package
-#' @param model_type Reference multi-state model is either Markov (\code{model_type = "M"}) or Semi-Markov (\code{model_type = "SM"})
+#' @param reference_model Specification of the reference model against which the new data is tested. Should be an object of class "reference_model".
 #' @param events List of (composite) events that shall be investigated
-#' @param cum_hazard_functions_h0 Cumulative hazard functions for transitions in this model under null hypothesis
 #' @param analysis_dates Vector of calendar dates of analyses
 #' @param accrual_duration Duration of accrual period
 #' @param sample_sizes Vector of sample size for which power shall be estimated. As the accrual duration is kept fixed, the
@@ -42,6 +40,9 @@
 #' cumhaz_13_example <- function(t) t^1.2
 #' cumhaz_23_example <- function(t) t^0.9
 #' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+#' reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+#'                                                intensities = cum_hazards_example,
+#'                                                type = model_type_example)
 #' analysis_dates_example <- c(1, 2)
 #' events_example <- list(c(2,3), c(3))
 #' names(events_example) <- c("PFS", "OS")
@@ -49,16 +50,20 @@
 #' sample_sizes_example <- seq(50, 150, 5)
 #' #In this example, the alternative is specified via separate hazard ratios for each transition
 #' hazard_ratios_example <- c(1.4, 1.2, 1.35)
-#' power_mvoslr_by_n(transition_matrix = tmat_example, model_type = model_type_example,
-#'                   events = events_example, cum_hazard_functions_h0 = cum_hazards_example,
-#'                   analysis_dates = analysis_dates_example,
+#' power_mvoslr_by_n(reference_model = reference_model_example,
+#'                   events = events_example, analysis_dates = analysis_dates_example,
 #'                   accrual_duration = accrual_duration_example,
 #'                   sample_sizes = sample_sizes_example, hazard_ratios = hazard_ratios_example,
 #'                   simulation_runs = 10)
-power_mvoslr_by_n <- function(transition_matrix, model_type, events, cum_hazard_functions_h0, analysis_dates,
+power_mvoslr_by_n <- function(reference_model, events, analysis_dates,
                               accrual_duration, sample_sizes, hazard_ratios = NULL, cum_hazard_functions_alternative = NULL,
                               norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL, time_steps = 100,
                               simulation_runs = 1000){
+
+  # Unpack information from reference model
+  transition_matrix <- reference_model$transition_matrix
+  cum_hazard_functions_h0 <- reference_model$intensities
+  model_type <- attributes(reference_model)$type
 
   transitions <- mstate::to.trans2(transition_matrix)
 
@@ -112,8 +117,7 @@ power_mvoslr_by_n <- function(transition_matrix, model_type, events, cum_hazard_
     # Collect results of simulated trial
     result <- execution_mvoslr_by_n(msm_data = sim_frame, analysis_dates = analysis_dates, accrual_duration = accrual_duration,
                                     current_analysis = num_analyses,
-                                    transition_matrix = transition_matrix, cum_hazard_functions = cum_hazard_functions_h0,
-                                    model_type = model_type, events = events, sample_sizes = sample_sizes,
+                                    reference_model = reference_model, events = events, sample_sizes = sample_sizes,
                                     norm = norm, boundaries = boundaries, alpha = alpha, weights = weights)
 
     p_collection[ , , i] <- result$stagewise_p_values

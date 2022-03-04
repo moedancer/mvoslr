@@ -20,9 +20,7 @@
 #' @param analysis_dates Vector of calendar dates of analyses
 #' @param accrual_duration Duration of accrual period
 #' @param current_analysis Number of the current analysis
-#' @param transition_matrix Matrix of transitions between states as in mstate package
-#' @param cum_hazard_functions Cumulative hazard functions for transitions in this model
-#' @param model_type Reference multi-state model is either Markov (\code{model_type = "M"}) or Semi-Markov (\code{model_type = "SM"})
+#' @param reference_model Specification of the reference model against which the new data is tested. Should be an object of class "reference_model"
 #' @param events List of (composite) events that shall be investigated
 #' @param sample_sizes Vector of sample sizes that shall be investigated
 #' @param norm Use either \eqn{L^2}-norm (\code{norm = "l2"}, default value) or \eqn{L^\infty}-norm (\code{norm = "linf"}) of vector of test statistics to compute stagewise p-values
@@ -43,8 +41,14 @@
 #'
 #' @keywords internal
 #'
-execution_mvoslr_by_n <- function(msm_data, analysis_dates, accrual_duration, current_analysis = NULL, transition_matrix, cum_hazard_functions,
-                                  model_type, events, sample_sizes, norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
+execution_mvoslr_by_n <- function(msm_data, analysis_dates, accrual_duration, current_analysis = NULL,
+                                  reference_model, events, sample_sizes,
+                                  norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL){
+
+  # Unpack information from reference model
+  transition_matrix <- reference_model$transition_matrix
+  cum_hazard_functions <- reference_model$intensities
+  model_type <- attributes(reference_model)$type
 
   # Check some arguments of the function
   if(!model_type %in% c("M", "SM")){

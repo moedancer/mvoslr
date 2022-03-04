@@ -35,11 +35,9 @@ test_that("execution for multiple sample sizes has the same outputs as simple ev
 
   # For this test, we need to run 'execution_mvoslr_by_n' separately as subsets are chosen randomly
   enhanced_result_full <- execution_mvoslr_by_n(msm_data = msm_data_example_full, analysis_dates = analysis_dates_example, accrual_duration = 1,
-                                                current_analysis = 2, transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                                model_type = model_type_example, events = events_example, sample_sizes = c(4))
+                                                current_analysis = 2, reference_model = reference_model_example, events = events_example, sample_sizes = c(4))
   enhanced_result_reduced <- execution_mvoslr_by_n(msm_data = msm_data_example_reduced, analysis_dates = analysis_dates_example, accrual_duration = 1,
-                                                current_analysis = 2, transition_matrix = tmat_example, cum_hazard_functions = cum_hazards_example,
-                                                model_type = model_type_example, events = events_example, sample_sizes = c(3))
+                                                current_analysis = 2, reference_model = reference_model_example, events = events_example, sample_sizes = c(3))
 
   expect_equal(unname(enhanced_result_full$raw_martingale[,,1]),
                unname(simple_result_full$raw_martingale))
