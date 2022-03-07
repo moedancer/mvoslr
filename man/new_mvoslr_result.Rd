@@ -24,7 +24,7 @@ new_mvoslr_result(
 
 \item{stagewise_p_values}{Stagewise p-values}
 
-\item{rejection_stage}{Number of stage at which the null hypothesis was rejected (is "NA" if null hypothesis could not be rejected)}
+\item{rejection_stage}{Number of stage at which the null hypothesis was rejected (is \code{NA} if null hypothesis could not be rejected)}
 
 \item{univariate_test_statistic}{Stagewise univariate test-statistics}
 }

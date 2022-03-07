@@ -252,18 +252,15 @@ execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, 
       cat("Chosen sequential boundary not available. Choose either \"obf\" or \"pocock\"!")
     }
 
-    inverse_normal_combine <- function(p){
-      k <- length(p)
-      reweighting_factor <- sqrt(1/sum(weights[1:k]^2))
-      current_weights <- weights[1:k] * reweighting_factor
-      summed_z <- sum(current_weights*qnorm(1-p))
-      return(1 - pnorm(summed_z))
+    # Define 'local' version of inverse normal combination function with weights specified above
+    inverse_normal_combine_loc <- function(p){
+      inverse_normal_combine(p, weights)
     }
 
     p_cum <- rep(0, current_analysis)
 
     for(i in 1:current_analysis){
-      p_cum[i] <- inverse_normal_combine(stagewise_p_values[1:i])
+      p_cum[i] <- inverse_normal_combine_loc(stagewise_p_values[1:i])
     }
 
     rejection <- p_cum <= levels[1:current_analysis]

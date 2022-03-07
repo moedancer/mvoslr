@@ -47,15 +47,7 @@ execution_mvoslr(
 \item{weights}{Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.}
 }
 \value{
-List of 6:
-\itemize{
-\item raw_martingale - Values of the multivariate process at all stages
-\item covariation_martrices - Estimated covariation matrices of the multivariate process at all stages
-\item stagewise_test_statistics - Stagewise univariate test statistics
-\item stagewise_p_values - Stagewise p-values
-\item decision - Decision to be made at the current analysis
-\item decision_stage - Number of analysis at which the null hypothesis is rejected (\code{NA} if not applicable)
-}
+Object of class "mvoslr_result"
 }
 \description{
 Execution of interim and final analyses of multivariate group-sequential one-sample log-rank test

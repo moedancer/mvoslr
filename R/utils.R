@@ -201,3 +201,32 @@ msdata_to_df <- function(msdata){
   return(ms_df)
 
 }
+
+#' Inverse normal combination function with arbitrary weights
+#'
+#' @param p Vector of staagewiswe p-values
+#' @param weights Vector of weights
+#'
+#' @return Overall p-value for vector of stagewise p-values with given weights
+#'
+#' @keywords  internal
+#'
+#' @examples
+#' my_p <- c(0.2, 0.1, 0.3)
+#' my_weights <- rep(1/sqrt(4), 4)
+#' mvoslr:::inverse_normal_combine(my_p, my_weights)
+#'
+inverse_normal_combine <- function(p, weights){
+
+  # Compute total weight of all analyses so far
+  k <- length(p)
+  reweighting_factor <- sqrt(1/sum(weights[1:k]^2))
+
+  # Recalculate weights based on this
+  current_weights <- weights[1:k] * reweighting_factor
+
+  # Compute z score and corresponding p-value
+  summed_z <- sum(current_weights*qnorm(1-p))
+  return(1 - pnorm(summed_z))
+
+}

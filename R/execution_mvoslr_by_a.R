@@ -254,13 +254,9 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
       cat("Chosen sequential boundary not available. Choose either \"obf\" or \"pocock\"!")
     }
 
-    # Helper function for execution of inverse normal designs
-    inverse_normal_combine <- function(p){
-      k <- length(p)
-      reweighting_factor <- sqrt(1/sum(weights[1:k]^2))
-      current_weights <- weights[1:k] * reweighting_factor
-      summed_z <- sum(current_weights*qnorm(1-p))
-      return(1 - pnorm(summed_z))
+    # Define 'local' version of inverse normal combination function with weights specified above
+    inverse_normal_combine_loc <- function(p){
+      inverse_normal_combine(p, weights)
     }
 
     # Compute p-values with inverse normal combination
@@ -268,7 +264,10 @@ execution_mvoslr_by_a <- function(msm_data, analysis_dates, current_analysis = N
 
     for(i in 1:current_analysis){
       # Need to apply matrix function for the special case i=1, otherwise this object is not recognized as a matrix
-      p_cum[i, ] <- apply(matrix(stagewise_p_values[1:i, ], nrow = i, ncol = number_accrual_durations), 2, inverse_normal_combine)
+      p_cum[i, ] <- apply(matrix(stagewise_p_values[1:i, ],
+                                 nrow = i,
+                                 ncol = number_accrual_durations),
+                          2, inverse_normal_combine_loc)
     }
 
     # Determine rejection

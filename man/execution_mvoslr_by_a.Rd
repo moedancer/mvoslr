@@ -52,14 +52,7 @@ Maximum number of sample sizes under consideration should be at most the number 
 \item{weights}{Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.}
 }
 \value{
-List of 4:
-\itemize{
-\item raw_martingale - Values of the multivariate process at all stages for all sample sizes
-\item stagewise_p_values - Stagewise p-values for all sample sizes
-\item decision - Decision to be made at the current analysis for each sample size
-\item decision_stage - Number of analysis at which the null hypothesis is rejected (\code{NA} if not applicable)
-for each sample size
-}
+Object of class "mvoslr_enhanced_result"
 }
 \description{
 For a given data set, this function can efficiently compute the results of the group-sequential multivariate one-sample
