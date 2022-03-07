@@ -39,9 +39,9 @@ test_that("execution for multiple sample sizes has the same outputs as simple ev
   enhanced_result_reduced <- execution_mvoslr_by_n(msm_data = msm_data_example_reduced, analysis_dates = analysis_dates_example, accrual_duration = 1,
                                                 current_analysis = 2, reference_model = reference_model_example, events = events_example, sample_sizes = c(3))
 
-  expect_equal(unname(enhanced_result_full$raw_martingale[,,1]),
+  expect_equal(unname(enhanced_result_full$raw_process[,,1]),
                unname(simple_result_full$raw_process))
-  expect_equal(unname(enhanced_result_reduced$raw_martingale[,,1]),
+  expect_equal(unname(enhanced_result_reduced$raw_process[,,1]),
                unname(simple_result_reduced$raw_process))
 
   expect_equal(unname(enhanced_result_reduced$stagewise_p_values[,1]),
@@ -82,9 +82,9 @@ test_that("execution for multiple accrual durations has the same outputs as simp
   enhanced_result <- execution_mvoslr_by_a(msm_data = msm_data_example_full, analysis_dates = analysis_dates_example, accrual_durations = c(0.8, 1),
                                            current_analysis = 2, reference_model = reference_model_example, events = events_example)
 
-  expect_equal(unname(enhanced_result$raw_martingale[,,1]),
+  expect_equal(unname(enhanced_result$raw_process[,,1]),
                unname(simple_result_reduced$raw_process))
-  expect_equal(unname(enhanced_result$raw_martingale[,,2]),
+  expect_equal(unname(enhanced_result$raw_process[,,2]),
                unname(simple_result_full$raw_process))
 
   expect_equal(unname(enhanced_result$stagewise_p_values[,1]),
@@ -134,9 +134,9 @@ test_that("execution for multiple accrual durations with fixed follow-up duratio
                                                follow_up = follow_up_example, current_analysis = 2, reference_model = reference_model_example,
                                                events = events_example)
 
-  expect_equal(unname(enhanced_result$raw_martingale[,,1]),
+  expect_equal(unname(enhanced_result$raw_process[,,1]),
                unname(simple_result_reduced$raw_process))
-  expect_equal(unname(enhanced_result$raw_martingale[,,2]),
+  expect_equal(unname(enhanced_result$raw_process[,,2]),
                unname(simple_result_full$raw_process))
 
   expect_equal(unname(enhanced_result$stagewise_p_values[,1]),

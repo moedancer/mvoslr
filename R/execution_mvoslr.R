@@ -21,15 +21,7 @@
 #' @param alpha Choose type I error rate (default value = 0.05)
 #' @param weights Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.
 #'
-#' @return List of 6:
-#' \itemize{
-#'   \item raw_martingale - Values of the multivariate process at all stages
-#'   \item covariation_martrices - Estimated covariation matrices of the multivariate process at all stages
-#'   \item stagewise_test_statistics - Stagewise univariate test statistics
-#'   \item stagewise_p_values - Stagewise p-values
-#'   \item decision - Decision to be made at the current analysis
-#'   \item decision_stage - Number of analysis at which the null hypothesis is rejected (\code{NA} if not applicable)
-#' }
+#' @return Object of class "mvoslr_result"
 #'
 #' @import stats
 #'
@@ -296,7 +288,7 @@ execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, 
                                 multivariate_test_statistics = mv_test_statistic,
                                 univariate_test_statistics = uv_test_statistic,
                                 stagewise_p_values = stagewise_p_values, rejection_stage = rejection_stage,
-                                remaining_analyses = length(analysis_dates) - current_analysis,
+                                remaining_analyses = as.integer(length(analysis_dates) - current_analysis),
                                 vector_norm = norm)
 
     return(result)

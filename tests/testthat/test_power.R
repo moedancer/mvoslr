@@ -144,8 +144,6 @@ test_that("power function with variable accrual duration correctly aggregates re
   decision_3_short <- !is.na(result_3$rejection_stage[2])
 
   set.seed(my_seed)
-  (result_1$raw_martingale[,,1] + result_2$raw_martingale[,,1] + result_3$raw_martingale[,,1])/3
-  (result_1$raw_martingale[,,2] + result_2$raw_martingale[,,2] + result_3$raw_martingale[,,2])/3
 
   power_result <- power_mvoslr_by_a(reference_model = reference_model_example,
                                     events = events_example,
@@ -153,9 +151,9 @@ test_that("power function with variable accrual duration correctly aggregates re
                                     accrual_durations = accrual_durations_example, recruitment_speed = recruitment_speed_example,
                                     hazard_ratios = hazard_ratios_example, simulation_runs = 3)
 
-  expect_equal(unname((result_1$raw_martingale[,,1] + result_2$raw_martingale[,,1] + result_3$raw_martingale[,,1])/3),
+  expect_equal(unname((result_1$raw_process[,,1] + result_2$raw_process[,,1] + result_3$raw_process[,,1])/3),
                unname(power_result$means[,,1]))
-  expect_equal(unname((result_1$raw_martingale[,,2] + result_2$raw_martingale[,,2] + result_3$raw_martingale[,,2])/3),
+  expect_equal(unname((result_1$raw_process[,,2] + result_2$raw_process[,,2] + result_3$raw_process[,,2])/3),
                unname(power_result$means[,,2]))
   expect_equal(unname(mean(c(decision_1_short, decision_2_short, decision_3_short))),
                unname(power_result$power[1]))
@@ -239,8 +237,6 @@ test_that("power function with variable accrual duration and fixed follow-up dur
   decision_3_short <- !is.na(result_3$rejection_stage[2])
 
   set.seed(my_seed)
-  (result_1$raw_martingale[,,1] + result_2$raw_martingale[,,1] + result_3$raw_martingale[,,1])/3
-  (result_1$raw_martingale[,,2] + result_2$raw_martingale[,,2] + result_3$raw_martingale[,,2])/3
 
   power_result <- power_mvoslr_fixed_fu(reference_model = reference_model_example,
                                         events = events_example, interim_analysis_dates = interim_analysis_dates_example,
@@ -248,9 +244,9 @@ test_that("power function with variable accrual duration and fixed follow-up dur
                                         recruitment_speed = recruitment_speed_example,
                                         hazard_ratios = hazard_ratios_example, simulation_runs = 3)
 
-  expect_equal(unname((result_1$raw_martingale[,,1] + result_2$raw_martingale[,,1] + result_3$raw_martingale[,,1])/3),
+  expect_equal(unname((result_1$raw_process[,,1] + result_2$raw_process[,,1] + result_3$raw_process[,,1])/3),
                unname(power_result$means[,,1]))
-  expect_equal(unname((result_1$raw_martingale[,,2] + result_2$raw_martingale[,,2] + result_3$raw_martingale[,,2])/3),
+  expect_equal(unname((result_1$raw_process[,,2] + result_2$raw_process[,,2] + result_3$raw_process[,,2])/3),
                unname(power_result$means[,,2]))
   expect_equal(unname(mean(c(decision_1_short, decision_2_short, decision_3_short))),
                unname(power_result$power[1]))

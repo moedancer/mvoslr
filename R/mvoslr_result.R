@@ -5,7 +5,7 @@
 #' @param multivariate_test_statistics Stagewise multivariate, standardised test-statistics
 #' @param univariate_test_statistic Stagewise univariate test-statistics
 #' @param stagewise_p_values Stagewise p-values
-#' @param rejection_stage Number of stage at which the null hypothesis was rejected (is "NA" if null hypothesis could not be rejected)
+#' @param rejection_stage Number of stage at which the null hypothesis was rejected (is \code{NA} if null hypothesis could not be rejected)
 #'
 #' @return Object of class "mvoslr_result"
 #'

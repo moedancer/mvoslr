@@ -30,14 +30,7 @@
 #' @param alpha Choose type I error rate (default value = 0.05)
 #' @param weights Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.
 #'
-#' @return List of 4:
-#' \itemize{
-#'   \item raw_martingale - Values of the multivariate process at all stages for all sample sizes
-#'   \item stagewise_p_values - Stagewise p-values for all sample sizes
-#'   \item decision - Decision to be made at the current analysis for each sample size
-#'   \item decision_stage - Number of analysis at which the null hypothesis is rejected (\code{NA} if not applicable)
-#'                          for each sample size
-#' }
+#' @return Object of class "mvoslr_enhanced_result"
 #'
 #' @import stats
 #'
@@ -402,34 +395,20 @@ execution_mvoslr_fixed_fu <- function(msm_data, interim_analysis_dates, follow_u
     rejection <- p_cum <= matrix(rep(levels[1:current_analysis], number_accrual_durations), ncol = number_accrual_durations)
     colnames(rejection) <- paste("a=", accrual_durations, sep = "")
 
-    # Helper function for following use of 'apply'
-    determine_overall_decision <- function(seq_decision){
+    # Find stage in which null hypothesis can be rejected (if possible)
+    rejection_stage <- apply(rejection, 2, function(x){
+      if(length(which(x)) == 0) {return(NA)} else {return(min(which(x)))}
+    })
 
-      if(current_analysis == number_of_analyses & sum(seq_decision) == 0){
-        decision <- "Accept H0"
-        rejection_stage <- NA
-      } else if(sum(seq_decision) >= 1){
-        rejection_stage <- min(which(seq_decision == 1))
-        decision <- paste("Reject H0 (in stage ", rejection_stage, ")", sep = "")
-      } else {
-        decision <- "Continue trial"
-        rejection_stage <- NA
-      }
+    result <- new_mvoslr_enhanced_result(raw_process = mv_martingale,
+                                         stagewise_p_values = stagewise_p_values,
+                                         rejection_stage = as.integer(rejection_stage),
+                                         remaining_analyses = as.integer(length(interim_analysis_dates) + 1 - current_analysis),
+                                         vector_norm = norm,
+                                         variable_parameter = "a",
+                                         parameter_values = accrual_durations,
+                                         follow_up_fixed = TRUE)
 
-      return(c(decision, rejection_stage))
-
-    }
-
-    decision_summary <- apply(rejection, 2, determine_overall_decision)
-
-    decision <- decision_summary[1, ]
-    rejection_stage <- decision_summary[2, ]
-
-    output <- list(raw_martingale = mv_martingale,
-                   stagewise_p_values = stagewise_p_values,
-                   decision = decision,
-                   rejection_stage = rejection_stage)
-
-    return(output)
+    return(result)
   }
 }
