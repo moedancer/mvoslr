@@ -111,9 +111,9 @@ power_mvoslr <- function(reference_model, events, analysis_dates, accrual_durati
                                boundaries = boundaries, alpha = alpha, weights = weights)
 
     p_collection[i, ] <- result$stagewise_p_values
-    decision_collection[i] <- ifelse(result$decision == "Accept H0", 0, 1)
+    decision_collection[i] <- ifelse(is.na(result$rejection_stage), 0, 1)
     rejection_stage_collection[i] <- result$rejection_stage
-    stagewise_test_stat_collection[ , , i] <- result$raw_martingale
+    stagewise_test_stat_collection[ , , i] <- result$raw_process
 
   }
 

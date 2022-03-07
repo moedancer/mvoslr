@@ -40,9 +40,9 @@ test_that("execution for multiple sample sizes has the same outputs as simple ev
                                                 current_analysis = 2, reference_model = reference_model_example, events = events_example, sample_sizes = c(3))
 
   expect_equal(unname(enhanced_result_full$raw_martingale[,,1]),
-               unname(simple_result_full$raw_martingale))
+               unname(simple_result_full$raw_process))
   expect_equal(unname(enhanced_result_reduced$raw_martingale[,,1]),
-               unname(simple_result_reduced$raw_martingale))
+               unname(simple_result_reduced$raw_process))
 
   expect_equal(unname(enhanced_result_reduced$stagewise_p_values[,1]),
                unname(simple_result_reduced$stagewise_p_values))
@@ -83,9 +83,9 @@ test_that("execution for multiple accrual durations has the same outputs as simp
                                            current_analysis = 2, reference_model = reference_model_example, events = events_example)
 
   expect_equal(unname(enhanced_result$raw_martingale[,,1]),
-               unname(simple_result_reduced$raw_martingale))
+               unname(simple_result_reduced$raw_process))
   expect_equal(unname(enhanced_result$raw_martingale[,,2]),
-               unname(simple_result_full$raw_martingale))
+               unname(simple_result_full$raw_process))
 
   expect_equal(unname(enhanced_result$stagewise_p_values[,1]),
                unname(simple_result_reduced$stagewise_p_values))
@@ -135,9 +135,9 @@ test_that("execution for multiple accrual durations with fixed follow-up duratio
                                                events = events_example)
 
   expect_equal(unname(enhanced_result$raw_martingale[,,1]),
-               unname(simple_result_reduced$raw_martingale))
+               unname(simple_result_reduced$raw_process))
   expect_equal(unname(enhanced_result$raw_martingale[,,2]),
-               unname(simple_result_full$raw_martingale))
+               unname(simple_result_full$raw_process))
 
   expect_equal(unname(enhanced_result$stagewise_p_values[,1]),
                unname(simple_result_reduced$stagewise_p_values))

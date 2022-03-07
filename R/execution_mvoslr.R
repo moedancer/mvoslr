@@ -292,14 +292,13 @@ execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, 
       rejection_stage <- NA
     }
 
-    output <- list(raw_martingale = mv_martingale,
-                   covariation_matrices = covariation_matrices,
-                   multivariate_test_statistics = mv_test_statistic,
-                   stagewise_test_statistics = uv_test_statistic,
-                   stagewise_p_values = stagewise_p_values,
-                   decision = decision,
-                   rejection_stage = rejection_stage)
+    result <- new_mvoslr_result(raw_process = mv_martingale, covariation_matrices = covariation_matrices,
+                                multivariate_test_statistics = mv_test_statistic,
+                                univariate_test_statistics = uv_test_statistic,
+                                stagewise_p_values = stagewise_p_values, rejection_stage = rejection_stage,
+                                remaining_analyses = length(analysis_dates) - current_analysis,
+                                vector_norm = norm)
 
-    return(output)
+    return(result)
   }
 }

@@ -65,7 +65,7 @@ test_that("power function correctly aggregates results from single trials", {
                                sample_size = sample_size_example, hazard_ratios = hazard_ratios_example,
                                simulation_runs = 3)
 
-  expect_equal(unname((result_1$raw_martingale + result_2$raw_martingale + result_3$raw_martingale)/3),
+  expect_equal(unname((result_1$raw_process + result_2$raw_process + result_3$raw_process)/3),
                power_result$means)
   expect_equal(mean(c(decision_1, decision_2, decision_3)),
                power_result$power)

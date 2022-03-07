@@ -55,9 +55,9 @@ test_that("result of execution function of multivariate log-rank test coincides
                              events = events_example)
 
   # Equality of of raw multivariate process
-  expect_equal(unname(result$raw_martingale[,1]),
+  expect_equal(unname(result$raw_process[,1]),
                c(N_1_PFS - A_1_PFS, N_1_OS - A_1_OS))
-  expect_equal(unname(result$raw_martingale[,2]),
+  expect_equal(unname(result$raw_process[,2]),
                c(N_1_PFS + N_2_PFS - (A_1_PFS + A_2_PFS),
                  N_1_OS + N_2_OS - (A_1_OS + A_2_OS)))
 
@@ -74,9 +74,9 @@ test_that("result of execution function of multivariate log-rank test coincides
                as.vector(std_mat_2 %*% c(N_2_PFS - A_2_PFS, N_2_OS - A_2_OS)))
 
   # Equality of univariate stagewise test statistics
-  expect_equal(unname(result$stagewise_test_statistics[1]),
+  expect_equal(unname(result$univariate_test_statistics[1]),
                sqrt(sum((std_mat_1 %*% c(N_1_PFS - A_1_PFS, N_1_OS - A_1_OS))^2)))
-  expect_equal(unname(result$stagewise_test_statistics[2]),
+  expect_equal(unname(result$univariate_test_statistics[2]),
                sqrt(sum((std_mat_2 %*% c(N_2_PFS - A_2_PFS, N_2_OS - A_2_OS))^2)))
 
   # Equality of stagewise p-values
@@ -162,12 +162,12 @@ test_that("result of execution function of multivariate log-rank test coincides
                              events = events_example)
 
   # Equality of of raw multivariate process
-  expect_equal(unname(result$raw_martingale[,1]),
+  expect_equal(unname(result$raw_process[,1]),
                c(N_1_Eff - A_1_Eff, N_1_Tox - A_1_Tox))
-  expect_equal(unname(result$raw_martingale[,2]),
+  expect_equal(unname(result$raw_process[,2]),
                c(N_1_Eff + N_2_Eff - (A_1_Eff + A_2_Eff),
                  N_1_Tox + N_2_Tox - (A_1_Tox + A_2_Tox)))
-  expect_equal(unname(result$raw_martingale[,3]),
+  expect_equal(unname(result$raw_process[,3]),
                c(N_1_Eff + N_2_Eff + N_3_Eff - (A_1_Eff + A_2_Eff + A_3_Eff),
                  N_1_Tox + N_2_Tox + N_3_Tox - (A_1_Tox + A_2_Tox + A_3_Tox)))
 
@@ -188,11 +188,11 @@ test_that("result of execution function of multivariate log-rank test coincides
                as.vector(std_mat_3 %*% c(N_3_Eff - A_3_Eff, N_3_Tox - A_3_Tox)))
 
   # Equality of univariate stagewise test statistics
-  expect_equal(unname(result$stagewise_test_statistics[1]),
+  expect_equal(unname(result$univariate_test_statistics[1]),
                sqrt(sum((std_mat_1 %*% c(N_1_Eff - A_1_Eff, N_1_Tox - A_1_Tox))^2)))
-  expect_equal(unname(result$stagewise_test_statistics[2]),
+  expect_equal(unname(result$univariate_test_statistics[2]),
                sqrt(sum((std_mat_2 %*% c(N_2_Eff - A_2_Eff, N_2_Tox - A_2_Tox))^2)))
-  expect_equal(unname(result$stagewise_test_statistics[3]),
+  expect_equal(unname(result$univariate_test_statistics[3]),
                sqrt(sum((std_mat_3 %*% c(N_3_Eff - A_3_Eff, N_3_Tox - A_3_Tox))^2)))
 
   # Equality of stagewise p-values
