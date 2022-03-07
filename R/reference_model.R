@@ -126,7 +126,7 @@ validate_reference_model <- function(model){
 
   }
 
-  model
+  return(model)
 
 }
 
