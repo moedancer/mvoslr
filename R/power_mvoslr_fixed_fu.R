@@ -3,10 +3,8 @@
 #' In this case the calendar dates of interim analyses are fixed and the minimum follow-up length are fixed.
 #' As the accrual duration can be varied, the calendar date of the final analysis varies.
 #'
-#' @param transition_matrix Matrix of transitions between states as in mstate package
-#' @param model_type Reference multi-state model is either Markov (\code{model_type = "M"}) or Semi-Markov (\code{model_type = "SM"})
+#' @param reference_model Specification of the reference model against which the new data is tested. Should be an object of class "reference_model"
 #' @param events List of (composite) events that shall be investigated
-#' @param cum_hazard_functions_h0 Cumulative hazard functions for transitions in this model under null hypothesis
 #' @param interim_analysis_dates Vector of calendar dates of interim analyses. Calendar date of final analysis depends on the respective accrual duration
 #' @param accrual_durations Vector of durations of accrual period
 #' @param follow_up Length of minimum follow-up
@@ -47,23 +45,31 @@
 #' cumhaz_13_example <- function(t) t^1.2
 #' cumhaz_23_example <- function(t) t^0.9
 #' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+#' reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+#'                                                intensities = cum_hazards_example,
+#'                                                type = model_type_example)
 #' interim_analysis_dates_example <- 1
 #' accrual_durations_example <- seq(0.5, 1.5, 0.2)
 #' follow_up_example <- 1
 #' recruitment_speed_example <- 100
 #' #In this example, the alternative is specified via separate hazard ratios for each transition
 #' hazard_ratios_example <- c(1.4, 1.2, 1.35)
-#' power_mvoslr_fixed_fu(transition_matrix = tmat_example, model_type = model_type_example,
-#'                       events = events_example, cum_hazard_functions_h0 = cum_hazards_example,
+#' power_mvoslr_fixed_fu(reference_model = reference_model_example,
+#'                       events = events_example,
 #'                       interim_analysis_dates = interim_analysis_dates_example,
 #'                       accrual_durations = accrual_durations_example,
 #'                       follow_up = follow_up_example,
 #'                       recruitment_speed = recruitment_speed_example,
 #'                       hazard_ratios = hazard_ratios_example, simulation_runs = 10)
-power_mvoslr_fixed_fu <- function(transition_matrix, model_type, events, cum_hazard_functions_h0, interim_analysis_dates,
+power_mvoslr_fixed_fu <- function(reference_model, events, interim_analysis_dates,
                                   accrual_durations, follow_up, recruitment_speed, hazard_ratios = NULL, cum_hazard_functions_alternative = NULL,
                                   norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL, time_steps = 100,
                                   simulation_runs = 1000){
+
+  # Unpack information from reference model
+  transition_matrix <- reference_model$transition_matrix
+  cum_hazard_functions_h0 <- reference_model$intensities
+  model_type <- attributes(reference_model)$type
 
   transitions <- mstate::to.trans2(transition_matrix)
 
@@ -118,8 +124,7 @@ power_mvoslr_fixed_fu <- function(transition_matrix, model_type, events, cum_haz
     # Collect results of simulated trial
     result <- execution_mvoslr_fixed_fu(msm_data = sim_frame, interim_analysis_dates = interim_analysis_dates,
                                         current_analysis = num_analyses, follow_up = follow_up,
-                                        transition_matrix = transition_matrix, cum_hazard_functions = cum_hazard_functions_h0,
-                                        model_type = model_type, events = events, accrual_durations = accrual_durations,
+                                        reference_model = reference_model, events = events, accrual_durations = accrual_durations,
                                         norm = norm, boundaries = boundaries, alpha = alpha, weights = weights)
 
     p_collection[ , , i] <- result$stagewise_p_values

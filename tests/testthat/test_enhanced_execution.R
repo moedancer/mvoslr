@@ -131,9 +131,8 @@ test_that("execution for multiple accrual durations with fixed follow-up duratio
 
   enhanced_result <- execution_mvoslr_fixed_fu(msm_data = msm_data_example_full, interim_analysis_dates = head(analysis_dates_example, -1),
                                                accrual_durations = accrual_durations_example,
-                                               follow_up = follow_up_example, current_analysis = 2, transition_matrix = tmat_example,
-                                               cum_hazard_functions = cum_hazards_example,
-                                               model_type = model_type_example, events = events_example)
+                                               follow_up = follow_up_example, current_analysis = 2, reference_model = reference_model_example,
+                                               events = events_example)
 
   expect_equal(unname(enhanced_result$raw_martingale[,,1]),
                unname(simple_result_reduced$raw_martingale))
