@@ -6,7 +6,7 @@
 \usage{
 new_mvoslr_result(
   raw_process = matrix(),
-  covariation_matrices = list(),
+  covariance_matrices = array(),
   multivariate_test_statistics = matrix(),
   univariate_test_statistics = numeric(),
   stagewise_p_values = numeric(),
@@ -18,7 +18,7 @@ new_mvoslr_result(
 \arguments{
 \item{raw_process}{Values of multivariate process at analysis dates}
 
-\item{covariation_matrices}{Estimated covariance matrix for multivariate process at analysis date}
+\item{covariance_matrices}{Estimated covariance matrix for multivariate process at analysis date}
 
 \item{multivariate_test_statistics}{Stagewise multivariate, standardised test-statistics}
 

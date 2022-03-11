@@ -259,29 +259,22 @@ execution_mvoslr <- function(msm_data, analysis_dates, current_analysis = NULL, 
 
     p_cum <- rep(0, current_analysis)
 
+    # Combine p_values for each stage and determine decision
     for(i in 1:current_analysis){
       p_cum[i] <- inverse_normal_combine_loc(stagewise_p_values[1:i])
     }
 
     rejection <- p_cum <= levels[1:current_analysis]
 
-    covariation_matrices <- lapply(seq(dim(covariance_estimate)[3]), function(x) covariance_estimate[ , , x])
+    # Rename covariance estimate if possible
     if(!is.null(names(events))){
-      covariation_matrices <- lapply(covariation_matrices, function(x) {colnames(x) <- names(events); x})
+      dimnames(covariance_estimate)[[1]] <- dimnames(covariance_estimate)[[2]]  <- names(events)
     }
 
-    if(current_analysis == number_of_analyses & sum(rejection) == 0){
-      decision <- "Accept H0"
-      rejection_stage <- NA
-    } else if(sum(rejection) >= 1){
-      rejection_stage <- min(which(rejection == 1))
-      decision <- paste("Reject H0 (in stage ", rejection_stage, ")", sep = "")
-    } else {
-      decision <- "Continue trial"
-      rejection_stage <- NA
-    }
+    # Extract rejection stage or set it to NA if no rejection occure
+    if(length(which(rejection)) == 0) {rejection_stage <- NA} else {rejection_stage <- min(which(rejection))}
 
-    result <- new_mvoslr_result(raw_process = mv_martingale, covariation_matrices = covariation_matrices,
+    result <- new_mvoslr_result(raw_process = mv_martingale, covariance_matrices = covariance_estimate,
                                 multivariate_test_statistics = mv_test_statistic,
                                 univariate_test_statistics = uv_test_statistic,
                                 stagewise_p_values = stagewise_p_values, rejection_stage = rejection_stage,

@@ -1,7 +1,7 @@
 #' Constructor for class "mvoslr_result" which is used to save and display results of multivariate one-sample log-rank tests
 #'
 #' @param raw_process Values of multivariate process at analysis dates
-#' @param covariation_matrices Estimated covariance matrix for multivariate process at analysis date
+#' @param covariance_matrices Estimated covariance matrix for multivariate process at analysis date
 #' @param multivariate_test_statistics Stagewise multivariate, standardised test-statistics
 #' @param univariate_test_statistic Stagewise univariate test-statistics
 #' @param stagewise_p_values Stagewise p-values
@@ -11,7 +11,7 @@
 #'
 #' @keywords internal
 new_mvoslr_result <- function(raw_process = matrix(),
-                              covariation_matrices = list(),
+                              covariance_matrices = array(),
                               multivariate_test_statistics = matrix(),
                               univariate_test_statistics = numeric(),
                               stagewise_p_values = numeric(),
@@ -20,7 +20,7 @@ new_mvoslr_result <- function(raw_process = matrix(),
                               vector_norm = character()){
 
   stopifnot(is.matrix(raw_process))
-  stopifnot(is.list(covariation_matrices))
+  stopifnot(is.array(covariance_matrices))
   stopifnot(is.matrix(multivariate_test_statistics))
   stopifnot(is.numeric(univariate_test_statistics))
   stopifnot(is.numeric(stagewise_p_values))
@@ -28,8 +28,26 @@ new_mvoslr_result <- function(raw_process = matrix(),
   stopifnot(is.integer(remaining_analyses))
   stopifnot(is.character(vector_norm))
 
+  # If events have no names in "raw_process", give them default names and apply those names to variance component
+  num_events <- dim(raw_process)[1]
+  default_event_names <- paste("Event", 1:num_events)
+  if(is.null(dimnames(raw_process)[[1]])){
+    dimnames(raw_process)[[1]] <- default_event_names
+    dimnames(covariance_matrices)[[1]] <- dimnames(covariance_matrices)[[2]] <- default_event_names
+    dimnames(multivariate_test_statistics)[[1]] <- default_event_names
+  }
+
+  # If analysis dates have no names in "raw_process", give them default names and apply those names to other components
+  num_analyses <- dim(raw_process)[2]
+  default_date_names <- paste("Analysis", 1:num_analyses)
+  if(is.null(dimnames(raw_process)[[2]])){
+    dimnames(raw_process)[[2]] <- default_date_names
+    dimnames(covariance_matrices)[[3]] <- dimnames(multivariate_test_statistics)[[2]] <- default_date_names
+    names(univariate_test_statistics) <- names(stagewise_p_values) <- default_date_names
+  }
+
   result <- structure(list(raw_process = raw_process,
-                           covariation_matrices = covariation_matrices,
+                           covariance_matrices = covariance_matrices,
                            multivariate_test_statistics = multivariate_test_statistics,
                            univariate_test_statistics = univariate_test_statistics,
                            stagewise_p_values = stagewise_p_values,
@@ -57,10 +75,10 @@ print.mvoslr_result <- function(result){
   } else if(is.na(result$rejection_stage) & result$remaining_analyses > 0) {
     cat("The null hypothesis could not be rejected so far. Continue trial.")
   } else {
-    cat("The null hypothesis can be rejected in stage", result$rejection_stage)
+    cat("The null hypothesis can be rejected in stage ", result$rejection_stage, ".", sep = "")
   }
 
-  return(result)
+  invisible(result)
 
 }
 

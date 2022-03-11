@@ -62,9 +62,9 @@ test_that("result of execution function of multivariate log-rank test coincides
                  N_1_OS + N_2_OS - (A_1_OS + A_2_OS)))
 
   # Equality of variance estimates
-  expect_equal(unname(result$covariation_matrices[[1]]),
+  expect_equal(unname(result$covariance_matrices[,,1]),
                cov_mat_1)
-  expect_equal(unname(result$covariation_matrices[[2]]),
+  expect_equal(unname(result$covariance_matrices[,,2]),
                cov_mat_1 + cov_mat_2)
 
   # Equality of standardised increments
@@ -172,11 +172,11 @@ test_that("result of execution function of multivariate log-rank test coincides
                  N_1_Tox + N_2_Tox + N_3_Tox - (A_1_Tox + A_2_Tox + A_3_Tox)))
 
   # Equality of variance estimates
-  expect_equal(unname(result$covariation_matrices[[1]]),
+  expect_equal(unname(result$covariance_matrices[,,1]),
                cov_mat_1)
-  expect_equal(unname(result$covariation_matrices[[2]]),
+  expect_equal(unname(result$covariance_matrices[,,2]),
                cov_mat_1 + cov_mat_2)
-  expect_equal(unname(result$covariation_matrices[[3]]),
+  expect_equal(unname(result$covariance_matrices[,,3]),
                cov_mat_1 + cov_mat_2 + cov_mat_3)
 
   # Equality of standardised increments
