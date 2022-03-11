@@ -19,13 +19,7 @@
 #'                   The time horizon over which the discretization happens is the calndar date of the last analysis.
 #' @param simulation_runs The number of simulation runs to estimate the power can be specified here.
 #'
-#' @return List of 4:
-#' \itemize{
-#'   \item power - Overall power of the procedure under the specified alternative
-#'   \item rejection_stages - Summary of stages in which the null hypothesis is rejected
-#'   \item means - Mean value of the multivariate process from which test statistics are computed for all stages
-#'   \item variances - Mean value of (co)variance estimates for the multivariate process for all stages
-#' }
+#' @return Object of class "mvoslr_power_object"
 #'
 #' @export
 #'
@@ -132,11 +126,12 @@ power_mvoslr <- function(reference_model, events, analysis_dates, accrual_durati
     }
   }
 
-  power_analysis <- list(power = power,
-                         rejection_stages = rejection_stages,
-                         means = mean_summary,
-                         variances = variance_summary)
+  output_obj <- list(power = power,
+                     rejection_stages = rejection_stages,
+                     means = mean_summary,
+                     variances = variance_summary,
+                     runs = simulation_runs)
 
-  return(power_analysis)
+  return(output_obj)
 }
 

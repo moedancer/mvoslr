@@ -140,52 +140,21 @@ power_mvoslr_fixed_fu <- function(reference_model, events, interim_analysis_date
   rejection_stages <- apply(rejection_stage_collection, 2,
                             function(stages){table(factor(stages, levels = 0:num_analyses), exclude = NULL)/simulation_runs})
 
-  # Helper function to combine overview over rejection stages for different accrual lengths into one matrix
-  custom_rbind <- function(data_a, data_b){
-    if(!is.matrix(data_a)) data_a <- t(as.matrix(data_a))
-    if(!is.matrix(data_b)) data_b <- t(as.matrix(data_b))
-    colnames(data_a) <- replace(colnames(data_a), which(is.na(colnames(data_a))), "Acceptance")
-    colnames(data_b) <- replace(colnames(data_b), which(is.na(colnames(data_b))), "Acceptance")
-    diff_1 <- setdiff(colnames(data_a), colnames(data_b))
-    diff_2 <- setdiff(colnames(data_b), colnames(data_a))
-    for(x in diff_1){
-      data_b <- cbind(data_b, 0)
-      colnames(data_b)[dim(data_b)[2]] <- x
-    }
-    for(x in diff_2){
-      data_a <- cbind(data_a, 0)
-      colnames(data_a)[dim(data_a)[2]] <- x
-    }
-    data_b <- data_b[,colnames(data_a)]
-    return(rbind(data_a, data_b))
-  }
-
-  # Create matrix for overview over rejection stages (if neccessary)
-  if(is.list(rejection_stages)){
-    rejection_stages <- Reduce(custom_rbind, rejection_stages)
-    rownames(rejection_stages) <- paste("a=", accrual_durations, sep = "")
-    rejection_stages <- t(rejection_stages)
-    rejection_stages <- rejection_stages[sort(rownames(rejection_stages)), ]
-  } else {
-    rownames(rejection_stages) <- replace(rownames(rejection_stages), which(rownames(rejection_stages) == 0), "Acceptance")
-  }
+  rownames(rejection_stages) <- replace(rownames(rejection_stages), which(rownames(rejection_stages) == 0), "Acceptance")
 
   # Compute means of raw martingales for each analysis and choice of accrual period
   mean_summary <- apply(stagewise_test_stat_collection, MARGIN = c(1,2,3), FUN = mean)
-  if(!is.null(names(events))){
-    dimnames(mean_summary)[[1]] <- names(events)
-  } else {
-    dimnames(mean_summary)[[1]] <- paste("Event", 1:num_events, sep = " ")
-  }
-  dimnames(mean_summary)[[2]] <- paste("Analysis", 1:num_analyses, sep = " ")
-  dimnames(mean_summary)[[3]] <- paste("a=", accrual_durations, sep = "")
 
   # Overview of estimated covariance matrices is omitted (would result in 4-dimensional array)
 
-  power_analysis <- list(power = power,
-                         rejection_stages = rejection_stages,
-                         means = mean_summary)
+  output_obj <- new_mvoslr_power_object(power = power,
+                                        rejection_stages = rejection_stages,
+                                        means = mean_summary,
+                                        variable_parameter = "a",
+                                        parameter_values = accrual_durations,
+                                        runs = simulation_runs,
+                                        follow_up_fixed = TRUE)
 
-  return(power_analysis)
+  return(output_obj)
 }
 

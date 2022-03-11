@@ -53,13 +53,7 @@ The time horizon over which the discretization happens is the calndar date of th
 \item{simulation_runs}{The number of simulation runs to estimate the power can be specified here.}
 }
 \value{
-List of 4:
-\itemize{
-\item power - Overall power of the procedure under the specified alternative
-\item rejection_stages - Summary of stages in which the null hypothesis is rejected
-\item means - Mean value of the multivariate process from which test statistics are computed for all stages
-\item variances - Mean value of (co)variance estimates for the multivariate process for all stages
-}
+Object of class "mvoslr_power_object"
 }
 \description{
 Estimation of power of group-sequential multivariate one-sample log-rank test via simulation
