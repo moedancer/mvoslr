@@ -127,7 +127,7 @@ power_mvoslr_by_a <- function(reference_model, events, analysis_dates, accrual_d
   rejection_stages <- apply(rejection_stage_collection, 2,
                             function(stages){table(factor(stages, levels = 0:num_analyses), exclude = NULL)/simulation_runs})
 
-  rownames(rejection_stages) <- replace(rownames(rejection_stages), which(rownames(rejection_stages) == 0), "Acceptance")
+  rownames(rejection_stages) <- replace(rownames(rejection_stages), which(rownames(rejection_stages) == "0"), "Acceptance")
 
   # Compute means of raw martingales for each analysis and choice of accrual period
   mean_summary <- apply(stagewise_test_stat_collection, MARGIN = c(1,2,3), FUN = mean)
@@ -228,24 +228,32 @@ power_mvoslr_by_a_par <- function(reference_model, events, analysis_dates, accru
     rest <- simulation_runs %% cores
     if(rest > 0) distributed_runs[1:rest] <- distributed_runs[1:rest] + 1
 
-    doParallel::registerDoParallel(cores)
+    cluster <- parallel::makeCluster(cores)
+    doParallel::registerDoParallel(cluster)
 
     # Define counter to pass checks
     i <- NULL
 
-    results_list <- foreach::"%dopar%"(foreach::foreach(i = 1:cores,
-                                                        .combine = list,
-                                                        .export = c("reference_model")),
+    "%dopar%" <- foreach::"%dopar%"
 
-                                       power_mvoslr_by_a(reference_model = reference_model, events = events,
-                                                         analysis_dates = analysis_dates, accrual_durations = accrual_durations,
-                                                         recruitment_speed = recruitment_speed, hazard_ratios = hazard_ratios,
-                                                         cum_hazard_functions_alternative = cum_hazard_functions_alternative,
-                                                         norm = norm, boundaries = boundaries, alpha = alpha, weights = weights,
-                                                         time_steps = time_steps, simulation_runs = distributed_runs[i])
+    power_mvoslr <- power_mvoslr
 
-    )
+    # Unclass reference model here to rebulid it on clusters
+    reference_model_unclassed <- unclass(reference_model)
 
+    results_list <- foreach::foreach(i = 1:cores, .combine = list) %dopar% {
+
+       result_loc <- power_mvoslr_by_a(reference_model = reference_model, events = events,
+                                       analysis_dates = analysis_dates, accrual_durations = accrual_durations,
+                                       recruitment_speed = recruitment_speed, hazard_ratios = hazard_ratios,
+                                       cum_hazard_functions_alternative = cum_hazard_functions_alternative,
+                                       norm = norm, boundaries = boundaries, alpha = alpha, weights = weights,
+                                       time_steps = time_steps, simulation_runs = distributed_runs[i])
+       result_loc
+
+    }
+
+    parallel::stopCluster(cluster)
     result <- aggregate_mvoslr_power_object(results_list)
 
   }

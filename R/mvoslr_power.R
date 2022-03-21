@@ -87,9 +87,7 @@ new_mvoslr_power_object <- function(power = numeric(),
 #' @keywords internal
 print.mvoslr_power_object <- function(power_obj){
 
-  if(length(power_obj$variable_parameter) == 0 |
-     is.na(power_obj$variable_parameter) |
-     is.null(power_obj$variable_parameter)){
+  if(length(power_obj$variable_parameter) == 0){
     cat("Empirical power achieved:", power_obj$power, "\n")
   } else {
     cat("Empirical power achieved for all parameter choices:\n")
@@ -173,10 +171,10 @@ aggregate_mvoslr_power_object <- function(power_obj_list){
   # Save attribute values of first list entry
   variable_parameter <- attributes(power_obj_list[[1]])$variable_parameter
   parameter_values <-attributes(power_obj_list[[1]])$parameter_values
-  follow_up_fixed <- attributes(power_obj_list[[1]])$fixed_follow_up
+  follow_up_fixed <- attributes(power_obj_list[[1]])$follow_up_fixed
 
   # Compute overall number of simulations and resulting weights
-  runs_list <- lapply(power_obj_list, FUN = function(x) x$runs)
+  runs_list <- lapply(power_obj_list, FUN = function(x) attributes(x)$simulation_runs)
   overall_runs <- do.call(sum, runs_list)
   weights_list <- lapply(runs_list, FUN = function(n) n/overall_runs)
 

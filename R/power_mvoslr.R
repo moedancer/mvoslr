@@ -112,7 +112,12 @@ power_mvoslr <- function(reference_model, events, analysis_dates, accrual_durati
   }
 
   power <- mean(decision_collection)
-  rejection_stages <- t(as.matrix(table(rejection_stage_collection, exclude = NULL)/simulation_runs))
+  rejection_stage_collection[is.na(rejection_stage_collection)] <- 0
+  rejection_stages <- t(as.matrix(table(factor(rejection_stage_collection,
+                                               levels = 0:num_analyses),
+                                        exclude = NULL)/simulation_runs))
+
+  colnames(rejection_stages) <- replace(colnames(rejection_stages), which(colnames(rejection_stages) == "0"), "Acceptance")
 
   mean_summary <- apply(stagewise_test_stat_collection, MARGIN = c(1,2), FUN = mean)
   variance_summary <- array(NA, dim = c(num_events, num_events, num_analyses))
@@ -210,41 +215,37 @@ power_mvoslr_par <- function(reference_model, events, analysis_dates, accrual_du
     # Distribute number of simulations to cores
     distributed_runs <- rep(floor(simulation_runs/cores), cores)
     rest <- simulation_runs %%cores
-    distributed_runs[1:rest] <- distributed_runs[1:rest] + 1
+    if(rest > 0) distributed_runs[1:rest] <- distributed_runs[1:rest] + 1
 
     cluster <- parallel::makeCluster(cores)
     doParallel::registerDoParallel(cluster)
-    parallel::clusterExport(cluster, c("discretize_functions", "simulate_msm", "msm_to_trial_data",
-                                       "new_reference_model", "validate_reference_model",
-                                       "print.reference_model", "summary.reference_model",
-                                       "power_mvoslr"))
 
     # Define counter to pass checks
     i <- NULL
 
     "%dopar%" <- foreach::"%dopar%"
 
+    power_mvoslr <- power_mvoslr
+
     # Unclass reference model here to rebulid it on clusters
     reference_model_unclassed <- unclass(reference_model)
 
-    results_list <- foreach::foreach(i = 1:cores, .combine = list, .packages = c("mvoslr", "mstate", "rpact")) %dopar% {
+    results_list <- foreach::foreach(i = 1:cores, .combine = list) %dopar% {
 
-      reference_model_loc <- new_reference_model(transition_matrix = reference_model_unclassed$transition_matrix,
-                                                 intensities = reference_model_unclassed$intensities,
-                                                 type = attributes(reference_model_unclassed)$type,
-                                                 parametric = attributes(reference_model_unclassed)$parametric)
+      result_loc <- power_mvoslr(reference_model = reference_model, events = events, analysis_dates = analysis_dates,
+                                 accrual_duration = accrual_duration, sample_size = sample_size,
+                                 hazard_ratios = hazard_ratios,
+                                 cum_hazard_functions_alternative = cum_hazard_functions_alternative,
+                                 norm = norm, boundaries = boundaries, alpha = alpha,
+                                 weights = weights,
+                                 time_steps = time_steps,
+                                 simulation_runs = distributed_runs[i])
 
-      power_mvoslr(reference_model = reference_model_loc, events = events, analysis_dates = analysis_dates,
-                   accrual_duration = accrual_duration, sample_size = sample_size,
-                   hazard_ratios = hazard_ratios,
-                   cum_hazard_functions_alternative = cum_hazard_functions_alternative,
-                   norm = norm, boundaries = boundaries, alpha = alpha,
-                   weights = weights,
-                   time_steps = time_steps,
-                   simulation_runs = distributed_runs[i])
+      result_loc
 
     }
 
+    parallel::stopCluster(cluster)
     result <- aggregate_mvoslr_power_object(results_list)
 
   }
