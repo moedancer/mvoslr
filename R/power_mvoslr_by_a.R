@@ -22,12 +22,7 @@
 #'                   The time horizon over which the discretization happens is the calndar date of the last analysis.
 #' @param simulation_runs The number of simulation runs to estimate the power can be specified here.
 #'
-#' @return List of 3:
-#' \itemize{
-#'   \item power - Overall power of the procedure under the specified alternative for each accrual duration
-#'   \item rejection_stages - Summary of stages in which the null hypothesis is rejected for each accrual duration
-#'   \item means - Mean value of the multivariate process from which test statistics are computed at each stage and for each accrual duration
-#' }
+#' @return Object of class "mvoslr_power_object"
 #' For the sake of clarity of the output, mean estimated (co)variance matrices are not reported here.
 #'
 #' @export
@@ -149,4 +144,114 @@ power_mvoslr_by_a <- function(reference_model, events, analysis_dates, accrual_d
 
   return(output_obj)
 }
+
+
+#' Estimation of power of group-sequential multivariate one-sample log-rank test via simulation with varying accrual durations (Parallelised version)
+#'
+#' In this case the calendar dates of all analyses are fixed. As the accrual duration can be varied, the minimum follow-up
+#' duration varies.
+#'
+#' @param reference_model Specification of the reference model against which the new data is tested. Should be an object of class "reference_model"
+#' @param events List of (composite) events that shall be investigated
+#' @param analysis_dates Vector of calendar dates of analyses. Calendar date of final analysis is fixed.
+#' @param accrual_durations Vector of durations of accrual period
+#' @param recruitment_speed Number of patients that can be recruited during one unit of time.
+#' @param hazard_ratios Specification of alternative hypothesis. One can either choose a single hazard ratio which then applies
+#'                      to each transition or a single hazard ratio for each transition in the model.
+#' @param cum_hazard_functions_alternative If non-proportional transition intensities are anticipated, the transition intensities
+#'                                         for all transitions, need to be specified here. If this argument is specified, it
+#'                                         overrules the argument \code{hazard_ratios}.
+#' @param norm Use either \eqn{L^2}-norm (\code{norm = "l2"}, default value) or \eqn{L^\infty}-norm (\code{norm = "linf"}) of vector of test statistics to compute stagewise p-values
+#' @param boundaries Use either O'Brien-Fleming'S (\code{boundaries = "obf"}, default value) or Pocock's (\code{boundaries = "pocock"}) sequential decision boundaries
+#' @param alpha Choose type I error rate (default value = 0.05)
+#' @param weights Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.
+#' @param time_steps As the multi-state model data will be simulated with the \code{mstate}-package, the transition intensities need
+#'                   to be discretized. The number of time steps in which the intensities will be discretized can be specified here.
+#'                   The time horizon over which the discretization happens is the calndar date of the last analysis.
+#' @param simulation_runs The number of simulation runs to estimate the power can be specified here.
+#' @param cores Number of cores to be used for the simulation
+#'
+#' @return Object of class "mvoslr_power_object"
+#' For the sake of clarity of the output, mean estimated (co)variance matrices are not reported here.
+#'
+#' @export
+#'
+#' @examples
+#' #Setup of reference multi-state model (here: simple illness-death model)
+#' library(mstate)
+#' tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
+#' number_of_trans_example <- dim(to.trans2(tmat_example))[1]
+#' model_type_example <- "SM"
+#' cumhaz_12_example <- function(t) t^1.1
+#' cumhaz_13_example <- function(t) t^1.2
+#' cumhaz_23_example <- function(t) t^0.9
+#' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+#' reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+#'                                                intensities = cum_hazards_example,
+#'                                                type = model_type_example)
+#' analysis_dates_example <- c(1, 2)
+#' events_example <- list(c(2,3), c(3))
+#' names(events_example) <- c("PFS", "OS")
+#' accrual_durations_example <- seq(0.5, 1.5, 0.2)
+#' recruitment_speed_example <- 100
+#' #In this example, the alternative is specified via separate hazard ratios for each transition
+#' hazard_ratios_example <- c(1.4, 1.2, 1.35)
+#' power_mvoslr_by_a_par(reference_model = reference_model_example, events = events_example,
+#'                       analysis_dates = analysis_dates_example,
+#'                       accrual_durations = accrual_durations_example,
+#'                       recruitment_speed = recruitment_speed_example,
+#'                       hazard_ratios = hazard_ratios_example, simulation_runs = 10, cores = 2)
+power_mvoslr_by_a_par <- function(reference_model, events, analysis_dates, accrual_durations,
+                                  recruitment_speed, hazard_ratios = NULL, cum_hazard_functions_alternative = NULL,
+                                  norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL, time_steps = 100,
+                                  simulation_runs = 1000, cores = NULL){
+  if(!requireNamespace("foreach", quietly = TRUE) |
+     !requireNamespace("parallel", quietly = TRUE) |
+     !requireNamespace("doParallel", quietly = TRUE)){
+
+    warning("Parallelised version cannot be used as suggested packages aren't installed.
+            Standard power calculation function is used instead.")
+
+    result <- power_mvoslr_by_a(reference_model = reference_model, events = events,
+                                analysis_dates = analysis_dates, accrual_durations = accrual_durations,
+                                recruitment_speed = recruitment_speed, hazard_ratios = hazard_ratios,
+                                cum_hazard_functions_alternative = cum_hazard_functions_alternative,
+                                norm = norm, boundaries = boundaries, alpha = alpha, weights = weights,
+                                time_steps = time_steps, simulation_runs = simulation_runs)
+
+  } else {
+
+    if(is.null(cores)) cores <- parallel::detectCores()
+
+    # Distribute number of simulations to cores
+    distributed_runs <- rep(floor(simulation_runs/cores), cores)
+    rest <- simulation_runs %% cores
+    if(rest > 0) distributed_runs[1:rest] <- distributed_runs[1:rest] + 1
+
+    doParallel::registerDoParallel(cores)
+
+    # Define counter to pass checks
+    i <- NULL
+
+    results_list <- foreach::"%dopar%"(foreach::foreach(i = 1:cores,
+                                                        .combine = list,
+                                                        .export = c("reference_model")),
+
+                                       power_mvoslr_by_a(reference_model = reference_model, events = events,
+                                                         analysis_dates = analysis_dates, accrual_durations = accrual_durations,
+                                                         recruitment_speed = recruitment_speed, hazard_ratios = hazard_ratios,
+                                                         cum_hazard_functions_alternative = cum_hazard_functions_alternative,
+                                                         norm = norm, boundaries = boundaries, alpha = alpha, weights = weights,
+                                                         time_steps = time_steps, simulation_runs = distributed_runs[i])
+
+    )
+
+    result <- aggregate_mvoslr_power_object(results_list)
+
+  }
+
+  return(result)
+
+}
+
 

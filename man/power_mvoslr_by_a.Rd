@@ -53,12 +53,7 @@ The time horizon over which the discretization happens is the calndar date of th
 \item{simulation_runs}{The number of simulation runs to estimate the power can be specified here.}
 }
 \value{
-List of 3:
-\itemize{
-\item power - Overall power of the procedure under the specified alternative for each accrual duration
-\item rejection_stages - Summary of stages in which the null hypothesis is rejected for each accrual duration
-\item means - Mean value of the multivariate process from which test statistics are computed at each stage and for each accrual duration
-}
+Object of class "mvoslr_power_object"
 For the sake of clarity of the output, mean estimated (co)variance matrices are not reported here.
 }
 \description{

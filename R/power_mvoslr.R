@@ -126,12 +126,131 @@ power_mvoslr <- function(reference_model, events, analysis_dates, accrual_durati
     }
   }
 
-  output_obj <- list(power = power,
-                     rejection_stages = rejection_stages,
-                     means = mean_summary,
-                     variances = variance_summary,
-                     runs = simulation_runs)
+  output_obj <- new_mvoslr_power_object(power = power,
+                                        rejection_stages = rejection_stages,
+                                        means = mean_summary,
+                                        runs = simulation_runs,
+                                        variances = variance_summary)
 
   return(output_obj)
 }
+
+
+#' Estimation of power of group-sequential multivariate one-sample log-rank test via simulation (parallelised version)
+#'
+#' @param reference_model Specification of the reference model against which the new data is tested. Should be an object of class "reference_model".
+#' @param events List of (composite) events that shall be investigated
+#' @param analysis_dates Vector of calendar dates of analyses
+#' @param accrual_duration Duration of accrual period
+#' @param sample_size Sample size for which power shall be estimated
+#' @param hazard_ratios Specification of alternative hypothesis. One can either choose a single hazard ratio which then applies
+#'                      to each transition or a single hazard ratio for each transition in the model.
+#' @param cum_hazard_functions_alternative If non-proportional transition intensities are anticipated, the transition intensities
+#'                                         for all transitions, need to be specified here. If this argument is specified, it
+#'                                         overrules the argument \code{hazard_ratios}.
+#' @param norm Use either \eqn{L^2}-norm (\code{norm = "l2"}, default value) or \eqn{L^\infty}-norm (\code{norm = "linf"}) of vector of test statistics to compute stagewise p-values
+#' @param boundaries Use either O'Brien-Fleming'S (\code{boundaries = "obf"}, default value) or Pocock's (\code{boundaries = "pocock"}) sequential decision boundaries
+#' @param alpha Choose type I error rate (default value = 0.05)
+#' @param weights Choose weights for inverse normal combination of stagewise p-values. Sum of squared values needs to sum up to 1.
+#' @param time_steps As the multi-state model data will be simulated with the \code{mstate}-package, the transition intensities need
+#'                   to be discretized. The number of time steps in which the intensities will be discretized can be specified here.
+#'                   The time horizon over which the discretization happens is the calndar date of the last analysis.
+#' @param simulation_runs The number of simulation runs to estimate the power can be specified here.
+#' @param cores Number of cores to be used for the simulation
+#'
+#' @return Object of class "mvoslr_power_object"
+#'
+#' @export
+#'
+#' @examples
+#' #Setup of reference multi-state model (here: simple illness-death model)
+#' library(mstate)
+#' tmat_example <- transMat(x = list(c(2,3),c(3),c()), names = c("a", "b", "c"))
+#' number_of_trans_example <- dim(to.trans2(tmat_example))[1]
+#' model_type_example <- "SM"
+#' cumhaz_12_example <- function(t) t^1.1
+#' cumhaz_13_example <- function(t) t^1.2
+#' cumhaz_23_example <- function(t) t^0.9
+#' cum_hazards_example <- list(cumhaz_12_example, cumhaz_13_example, cumhaz_23_example)
+#' reference_model_example <- new_reference_model(transition_matrix = tmat_example,
+#'                                                intensities = cum_hazards_example,
+#'                                                type = model_type_example)
+#' analysis_dates_example <- c(1, 2)
+#' events_example <- list(c(2,3), c(3))
+#' names(events_example) <- c("PFS", "OS")
+#' accrual_duration_example <- 1
+#' sample_size_example <- 100
+#' #In this example, the alternative is specified via separate hazard ratios for each transition
+#' hazard_ratios_example <- c(1.4, 1.2, 1.35)
+#' power_mvoslr_par(reference_model = reference_model_example, events = events_example,
+#'                  analysis_dates = analysis_dates_example,
+#'                  accrual_duration = accrual_duration_example, sample_size = sample_size_example,
+#'                  hazard_ratios = hazard_ratios_example, simulation_runs = 10, cores = 2)
+power_mvoslr_par <- function(reference_model, events, analysis_dates, accrual_duration, sample_size,
+                             hazard_ratios = NULL, cum_hazard_functions_alternative = NULL,
+                             norm = "l2", boundaries = "obf", alpha = 0.05, weights = NULL, time_steps = 100,
+                             simulation_runs = 1000, cores = NULL){
+
+  if(!requireNamespace("foreach", quietly = TRUE) |
+     !requireNamespace("parallel", quietly = TRUE) |
+     !requireNamespace("doParallel", quietly = TRUE)){
+
+    warning("Parallelised version cannot be used as suggested packages aren't installed.
+            Standard power calculation function is used instead.")
+
+    result <- power_mvoslr(reference_model, events, analysis_dates, accrual_duration, sample_size,
+                           hazard_ratios, cum_hazard_functions_alternative,
+                           norm, boundaries, alpha, weights, time_steps,
+                           simulation_runs)
+
+  } else {
+
+    if(is.null(cores)) cores <- parallel::detectCores()
+
+    # Distribute number of simulations to cores
+    distributed_runs <- rep(floor(simulation_runs/cores), cores)
+    rest <- simulation_runs %%cores
+    distributed_runs[1:rest] <- distributed_runs[1:rest] + 1
+
+    cluster <- parallel::makeCluster(cores)
+    doParallel::registerDoParallel(cluster)
+    parallel::clusterExport(cluster, c("discretize_functions", "simulate_msm", "msm_to_trial_data",
+                                       "new_reference_model", "validate_reference_model",
+                                       "print.reference_model", "summary.reference_model",
+                                       "power_mvoslr"))
+
+    # Define counter to pass checks
+    i <- NULL
+
+    "%dopar%" <- foreach::"%dopar%"
+
+    # Unclass reference model here to rebulid it on clusters
+    reference_model_unclassed <- unclass(reference_model)
+
+    results_list <- foreach::foreach(i = 1:cores, .combine = list, .packages = c("mvoslr", "mstate", "rpact")) %dopar% {
+
+      reference_model_loc <- new_reference_model(transition_matrix = reference_model_unclassed$transition_matrix,
+                                                 intensities = reference_model_unclassed$intensities,
+                                                 type = attributes(reference_model_unclassed)$type,
+                                                 parametric = attributes(reference_model_unclassed)$parametric)
+
+      power_mvoslr(reference_model = reference_model_loc, events = events, analysis_dates = analysis_dates,
+                   accrual_duration = accrual_duration, sample_size = sample_size,
+                   hazard_ratios = hazard_ratios,
+                   #cum_hazard_functions_alternative = cum_hazard_functions_alternative,
+                   norm = norm, boundaries = boundaries, alpha = alpha,
+                   #weights = weights,
+                   time_steps = time_steps,
+                   simulation_runs = distributed_runs[i])
+
+    }
+
+    result <- aggregate_mvoslr_power_object(results_list)
+
+  }
+
+  return(result)
+
+}
+
 
