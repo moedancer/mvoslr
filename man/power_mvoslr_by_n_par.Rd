@@ -83,9 +83,9 @@ accrual_duration_example <- 1
 sample_sizes_example <- seq(50, 150, 5)
 #In this example, the alternative is specified via separate hazard ratios for each transition
 hazard_ratios_example <- c(1.4, 1.2, 1.35)
-power_mvoslr_by_n(reference_model = reference_model_example,
-                  events = events_example, analysis_dates = analysis_dates_example,
-                  accrual_duration = accrual_duration_example,
-                  sample_sizes = sample_sizes_example, hazard_ratios = hazard_ratios_example,
-                  simulation_runs = 10, cores = 2)
+power_mvoslr_by_n_par(reference_model = reference_model_example,
+                      events = events_example, analysis_dates = analysis_dates_example,
+                      accrual_duration = accrual_duration_example,
+                      sample_sizes = sample_sizes_example, hazard_ratios = hazard_ratios_example,
+                      simulation_runs = 10, cores = 2)
 }
