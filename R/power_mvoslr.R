@@ -112,7 +112,7 @@ power_mvoslr <- function(reference_model, events, analysis_dates, accrual_durati
   }
 
   power <- mean(decision_collection)
-  rejection_stages <- table(rejection_stage_collection, exclude = NULL)/simulation_runs
+  rejection_stages <- t(as.matrix(table(rejection_stage_collection, exclude = NULL)/simulation_runs))
 
   mean_summary <- apply(stagewise_test_stat_collection, MARGIN = c(1,2), FUN = mean)
   variance_summary <- array(NA, dim = c(num_events, num_events, num_analyses))
@@ -237,9 +237,9 @@ power_mvoslr_par <- function(reference_model, events, analysis_dates, accrual_du
       power_mvoslr(reference_model = reference_model_loc, events = events, analysis_dates = analysis_dates,
                    accrual_duration = accrual_duration, sample_size = sample_size,
                    hazard_ratios = hazard_ratios,
-                   #cum_hazard_functions_alternative = cum_hazard_functions_alternative,
+                   cum_hazard_functions_alternative = cum_hazard_functions_alternative,
                    norm = norm, boundaries = boundaries, alpha = alpha,
-                   #weights = weights,
+                   weights = weights,
                    time_steps = time_steps,
                    simulation_runs = distributed_runs[i])
 

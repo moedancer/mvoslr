@@ -32,9 +32,7 @@ new_mvoslr_power_object <- function(power = numeric(),
   stopifnot(is.logical(follow_up_fixed))
 
   # If there is a variable parameter, name results correspondingly
-  if(length(variable_parameter) > 0 &
-     !is.na(variable_parameter) &
-     !is.null(variable_parameter)){
+  if(length(variable_parameter) > 0){
 
     dimname_template <- paste(variable_parameter, "=", parameter_values)
     names(power) <- colnames(rejection_stages) <- dimnames(means)[[3]] <- dimname_template
